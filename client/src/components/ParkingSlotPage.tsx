@@ -88,7 +88,6 @@ const ParkingSlotPage: React.FC = () => {
   const [selectedMapSlot, setSelectedMapSlot] = useState<ParkingSlot | null>(
     null
   );
-  const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
   const [duration, setDuration] = useState(1);
   const { token, user } = useAuth();
   const API = import.meta.env.VITE_API_URL;
@@ -174,8 +173,6 @@ const ParkingSlotPage: React.FC = () => {
               lat: position.coords.latitude,
               lng: position.coords.longitude,
             };
-
-            setUserLocation(userLoc);
 
             // Get address from coordinates
             try {
@@ -1079,7 +1076,7 @@ const ParkingSlotPage: React.FC = () => {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {statusDistributionData.map((entry, index) => (
+                    {statusDistributionData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={COLORS[index % COLORS.length]}
