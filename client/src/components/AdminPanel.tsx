@@ -12,13 +12,7 @@ import {
   Check,
   AlertCircle,
   Calendar,
-  MapPin,
 } from "lucide-react";
-
-interface Coordinates {
-  lat: number;
-  lng: number;
-}
 
 interface ParkingSlot {
   _id: string;
@@ -30,21 +24,6 @@ interface ParkingSlot {
   availableSlots: number;
   distance?: string;
   rating?: number;
-  coordinates: Coordinates;
-  addressDetails?: {
-    street?: string;
-    area?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-    zipCode?: string;
-  };
-  features?: string[];
-  description?: string;
-  openingTime: string;
-  closingTime: string;
-  securityLevel: string;
-  isCovered: boolean;
 }
 
 interface User {
@@ -81,18 +60,7 @@ export default function AdminPanel() {
   const [parkingSlots, setParkingSlots] = useState<ParkingSlot[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [slotForm, setSlotForm] = useState<Partial<ParkingSlot>>({
-    status: "available",
-    capacity: 50,
-    availableSlots: 50,
-    pricePerHour: 50,
-    isCovered: false,
-    securityLevel: "medium",
-    openingTime: "06:00 AM",
-    closingTime: "11:00 PM",
-    features: [],
-    coordinates: { lat: 28.6139, lng: 77.209 },
-  });
+  const [slotForm, setSlotForm] = useState<Partial<ParkingSlot>>({});
   const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
   const [loading, setLoading] = useState({
     parking: true,
@@ -111,8 +79,6 @@ export default function AdminPanel() {
     id: string;
     name: string;
   } | null>(null);
-  const [locationSearch, setLocationSearch] = useState("");
-  const [isSearchingLocation, setIsSearchingLocation] = useState(false);
 
   const { token } = useAuth();
   const API = import.meta.env.VITE_API_URL;
@@ -198,6 +164,11 @@ export default function AdminPanel() {
   const fetchBookings = async () => {
     try {
       setLoading((prev) => ({ ...prev, bookings: true }));
+      console.log(
+        "📌 Fetching bookings with token:",
+        token?.substring(0, 20) + "..."
+      );
+
       const res = await fetch(`${API}/api/bookings/all`, {
         method: "GET",
         headers: {
@@ -206,12 +177,16 @@ export default function AdminPanel() {
         },
       });
 
+      console.log("📌 Bookings API response status:", res.status);
+
       if (!res.ok) {
         const text = await res.text();
+        console.error("❌ Bookings API error response:", text);
         throw new Error(`HTTP ${res.status}: ${text}`);
       }
 
       const data = await res.json();
+      console.log("📌 Bookings API data:", data);
 
       if (data.success) {
         setBookings(data.data);
@@ -225,45 +200,6 @@ export default function AdminPanel() {
       setLoading((prev) => ({ ...prev, bookings: false }));
     }
   };
-
-  // Location search handler
-  const handleLocationSearch = async () => {
-    if (!locationSearch.trim()) return;
-
-    try {
-      setIsSearchingLocation(true);
-      const res = await fetch(
-        `${API}/api/geocode/forward?query=${encodeURIComponent(locationSearch)}`
-      );
-      const data = await res.json();
-
-      if (data.success) {
-        const location = data.data;
-        setSlotForm({
-          ...slotForm,
-          location: location.formattedAddress,
-          coordinates: {
-            lat: location.coordinates.lat,
-            lng: location.coordinates.lng,
-          },
-          addressDetails: {
-            street: location.addressComponents?.street || "",
-            area: location.addressComponents?.area || "",
-            city: location.addressComponents?.city || "",
-            state: location.addressComponents?.state || "",
-            country: location.addressComponents?.country || "India",
-            zipCode: location.addressComponents?.zipCode || "",
-          },
-        });
-      }
-    } catch (error) {
-      console.error("Location search error:", error);
-      setError("Failed to search location");
-    } finally {
-      setIsSearchingLocation(false);
-    }
-  };
-
   // Handle Slot Operations
   const handleDeleteSlot = async (id: string) => {
     try {
@@ -281,10 +217,7 @@ export default function AdminPanel() {
 
   const handleEditSlot = (slot: ParkingSlot) => {
     setEditingSlotId(slot._id);
-    setSlotForm({
-      ...slot,
-      coordinates: slot.coordinates || { lat: 28.6139, lng: 77.209 },
-    });
+    setSlotForm(slot);
     setShowSlotForm(true);
   };
 
@@ -313,10 +246,6 @@ export default function AdminPanel() {
       setError("Available slots cannot exceed capacity");
       return;
     }
-    if (!slotForm.coordinates?.lat || !slotForm.coordinates?.lng) {
-      setError("Coordinates are required");
-      return;
-    }
 
     try {
       const method = editingSlotId ? "PUT" : "POST";
@@ -335,26 +264,12 @@ export default function AdminPanel() {
           pricePerHour: Number(slotForm.pricePerHour),
           capacity: Number(slotForm.capacity),
           availableSlots: Number(slotForm.availableSlots),
-          coordinates: slotForm.coordinates,
-          isCovered: Boolean(slotForm.isCovered),
-          features: Array.isArray(slotForm.features) ? slotForm.features : [],
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        setSlotForm({
-          status: "available",
-          capacity: 50,
-          availableSlots: 50,
-          pricePerHour: 50,
-          isCovered: false,
-          securityLevel: "medium",
-          openingTime: "06:00 AM",
-          closingTime: "11:00 PM",
-          features: [],
-          coordinates: { lat: 28.6139, lng: 77.209 },
-        });
+        setSlotForm({});
         setEditingSlotId(null);
         setShowSlotForm(false);
         fetchParkingSlots();
@@ -425,6 +340,8 @@ export default function AdminPanel() {
 
   const handleDeleteBooking = async (id: string) => {
     try {
+      console.log("📌 Deleting booking:", id);
+
       const res = await fetch(`${API}/api/bookings/admin-delete/${id}`, {
         method: "DELETE",
         headers: {
@@ -441,6 +358,7 @@ export default function AdminPanel() {
       const data = await res.json();
 
       if (data.success) {
+        console.log("✅ Booking deleted successfully");
         fetchBookings();
         setShowDeleteConfirm(null);
       } else {
@@ -472,10 +390,7 @@ export default function AdminPanel() {
   const filteredSlots = parkingSlots.filter(
     (slot) =>
       slot.name.toLowerCase().includes(searchTerm.parking.toLowerCase()) ||
-      slot.location.toLowerCase().includes(searchTerm.parking.toLowerCase()) ||
-      (slot.addressDetails?.city?.toLowerCase() || "").includes(
-        searchTerm.parking.toLowerCase()
-      )
+      slot.location.toLowerCase().includes(searchTerm.parking.toLowerCase())
   );
 
   const filteredUsers = (users || []).filter((user) => {
@@ -542,41 +457,6 @@ export default function AdminPanel() {
       default:
         return "bg-gray-500/20 text-gray-300";
     }
-  };
-
-  const getDistanceFromDelhi = (coordinates: Coordinates): string => {
-    if (!coordinates) return "N/A";
-
-    const delhiCoords = { lat: 28.6139, lng: 77.209 };
-    const distance = calculateDistance(
-      coordinates.lat,
-      coordinates.lng,
-      delhiCoords.lat,
-      delhiCoords.lng
-    );
-
-    return distance < 1
-      ? `${(distance * 1000).toFixed(0)} m`
-      : `${distance.toFixed(1)} km`;
-  };
-
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
-    const R = 6371; // Earth's radius in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
   };
 
   return (
@@ -729,7 +609,7 @@ export default function AdminPanel() {
                 </div>
                 <input
                   type="text"
-                  placeholder="Search parking slots by name, location, or city..."
+                  placeholder="Search parking slots by name or location..."
                   value={searchTerm.parking}
                   onChange={(e) =>
                     setSearchTerm((prev) => ({
@@ -742,18 +622,7 @@ export default function AdminPanel() {
               </div>
               <button
                 onClick={() => {
-                  setSlotForm({
-                    status: "available",
-                    capacity: 50,
-                    availableSlots: 50,
-                    pricePerHour: 50,
-                    isCovered: false,
-                    securityLevel: "medium",
-                    openingTime: "06:00 AM",
-                    closingTime: "11:00 PM",
-                    features: [],
-                    coordinates: { lat: 28.6139, lng: 77.209 },
-                  });
+                  setSlotForm({});
                   setEditingSlotId(null);
                   setShowSlotForm(true);
                 }}
@@ -783,18 +652,7 @@ export default function AdminPanel() {
                 </p>
                 <button
                   onClick={() => {
-                    setSlotForm({
-                      status: "available",
-                      capacity: 50,
-                      availableSlots: 50,
-                      pricePerHour: 50,
-                      isCovered: false,
-                      securityLevel: "medium",
-                      openingTime: "06:00 AM",
-                      closingTime: "11:00 PM",
-                      features: [],
-                      coordinates: { lat: 28.6139, lng: 77.209 },
-                    });
+                    setSlotForm({});
                     setShowSlotForm(true);
                   }}
                   className="px-6 py-3 bg-linear-to-r from-[#1B42CB] to-[#FF2F6C] text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-[#FF2F6C]/20 transition-all duration-300"
@@ -818,10 +676,6 @@ export default function AdminPanel() {
                       <div className="text-sm font-medium">
                         {slot.availableSlots}/{slot.capacity} slots
                       </div>
-                      <div className="text-xs flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        {slot.addressDetails?.city || "Delhi"}
-                      </div>
                     </div>
 
                     {/* Slot Content */}
@@ -831,12 +685,9 @@ export default function AdminPanel() {
                           <h3 className="text-xl font-bold text-[#EEECF6] mb-1">
                             {slot.name}
                           </h3>
-                          <div className="flex items-center gap-2 text-sm">
-                            <MapPin className="w-4 h-4 text-[#1B42CB]" />
-                            <p className="text-[#EEECF6]/60 truncate">
-                              {slot.addressDetails?.area || slot.location}
-                            </p>
-                          </div>
+                          <p className="text-[#EEECF6]/60 text-sm">
+                            {slot.location}
+                          </p>
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-[#EEECF6]">
@@ -844,24 +695,6 @@ export default function AdminPanel() {
                           </div>
                           <div className="text-sm text-[#EEECF6]/60">
                             per hour
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Location Info */}
-                      <div className="mb-4 p-3 bg-[#1B42CB]/10 rounded-xl border border-[#1B42CB]/20">
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div>
-                            <div className="text-[#EEECF6]/60">City</div>
-                            <div className="font-medium text-[#EEECF6]">
-                              {slot.addressDetails?.city || "Delhi"}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="text-[#EEECF6]/60">Distance</div>
-                            <div className="font-medium text-[#EEECF6]">
-                              {getDistanceFromDelhi(slot.coordinates)}
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -890,27 +723,6 @@ export default function AdminPanel() {
                           ></div>
                         </div>
                       </div>
-
-                      {/* Features */}
-                      {slot.features && slot.features.length > 0 && (
-                        <div className="mb-4">
-                          <div className="flex flex-wrap gap-1">
-                            {slot.features.slice(0, 3).map((feature, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-1 bg-[#1B42CB]/20 text-[#1B42CB] text-xs rounded-lg"
-                              >
-                                {feature}
-                              </span>
-                            ))}
-                            {slot.features.length > 3 && (
-                              <span className="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded-lg">
-                                +{slot.features.length - 3}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
 
                       {/* Action Buttons */}
                       <div className="flex gap-2">
@@ -1238,8 +1050,8 @@ export default function AdminPanel() {
       {/* Slot Form Modal */}
       {showSlotForm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="backdrop-blur-xl bg-[#191919]/90 border border-[#1B42CB]/30 rounded-2xl w-full max-w-2xl shadow-2xl shadow-[#1B42CB]/10 max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-[#1B42CB]/20 sticky top-0 bg-[#191919]/90 z-10">
+          <div className="backdrop-blur-xl bg-[#191919]/90 border border-[#1B42CB]/30 rounded-2xl w-full max-w-2xl shadow-2xl shadow-[#1B42CB]/10">
+            <div className="p-6 border-b border-[#1B42CB]/20">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-[#EEECF6]">
                   {editingSlotId ? "Edit Parking Slot" : "Add New Parking Slot"}
@@ -1247,18 +1059,7 @@ export default function AdminPanel() {
                 <button
                   onClick={() => {
                     setShowSlotForm(false);
-                    setSlotForm({
-                      status: "available",
-                      capacity: 50,
-                      availableSlots: 50,
-                      pricePerHour: 50,
-                      isCovered: false,
-                      securityLevel: "medium",
-                      openingTime: "06:00 AM",
-                      closingTime: "11:00 PM",
-                      features: [],
-                      coordinates: { lat: 28.6139, lng: 77.209 },
-                    });
+                    setSlotForm({});
                     setEditingSlotId(null);
                   }}
                   className="w-8 h-8 rounded-lg bg-[#191919] border border-[#1B42CB]/30 flex items-center justify-center text-[#EEECF6] hover:bg-[#FF2F6C]/10 hover:border-[#FF2F6C]/30 transition-colors"
@@ -1269,390 +1070,122 @@ export default function AdminPanel() {
             </div>
 
             <form onSubmit={handleAddOrUpdateSlot} className="p-6">
-              <div className="space-y-6">
-                {/* Basic Information */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#EEECF6] mb-4">
-                    Basic Information
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Slot Name *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={slotForm.name || ""}
-                        onChange={(e) =>
-                          setSlotForm({ ...slotForm, name: e.target.value })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="Enter slot name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Price per Hour (₹) *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        step="0.01"
-                        value={slotForm.pricePerHour || ""}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            pricePerHour: Number(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="Enter price"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Status
-                      </label>
-                      <select
-                        value={slotForm.status || "available"}
-                        onChange={(e) =>
-                          setSlotForm({ ...slotForm, status: e.target.value })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                      >
-                        <option value="available">Available</option>
-                        <option value="occupied">Occupied</option>
-                        <option value="maintenance">Maintenance</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Security Level
-                      </label>
-                      <select
-                        value={slotForm.securityLevel || "medium"}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            securityLevel: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                      >
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="premium">Premium</option>
-                      </select>
-                    </div>
-                  </div>
+                  <label className="block text-sm font-medium text-[#EEECF6] mb-2">
+                    Slot Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={slotForm.name || ""}
+                    onChange={(e) =>
+                      setSlotForm({ ...slotForm, name: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
+                    placeholder="Enter slot name"
+                  />
                 </div>
-
-                {/* Location Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-[#EEECF6] mb-4">
-                    Location Information
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Search Location *
-                      </label>
-                      <div className="flex gap-2">
-                        <div className="flex-1 relative">
-                          <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                            <MapPin className="w-5 h-5 text-[#1B42CB]" />
-                          </div>
-                          <input
-                            type="text"
-                            value={locationSearch}
-                            onChange={(e) => setLocationSearch(e.target.value)}
-                            placeholder="Search location (e.g., Connaught Place, Delhi)"
-                            className="w-full pl-12 pr-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] placeholder-[#EEECF6]/40 focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleLocationSearch}
-                          disabled={isSearchingLocation}
-                          className="px-4 py-3 bg-linear-to-r from-[#1B42CB] to-[#FF2F6C] text-white font-medium rounded-xl hover:shadow-lg hover:shadow-[#FF2F6C]/20 transition-all duration-300 disabled:opacity-50"
-                        >
-                          {isSearchingLocation ? "Searching..." : "Search"}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Location/Address *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={slotForm.location || ""}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            location: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="Enter full location address"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                          Latitude *
-                        </label>
-                        <input
-                          type="number"
-                          step="any"
-                          required
-                          value={slotForm.coordinates?.lat || ""}
-                          onChange={(e) =>
-                            setSlotForm({
-                              ...slotForm,
-                              coordinates: {
-                                lat: parseFloat(e.target.value),
-                                lng: slotForm.coordinates?.lng || 77.209,
-                              },
-                            })
-                          }
-                          className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                          placeholder="e.g., 28.6139"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                          Longitude *
-                        </label>
-                        <input
-                          type="number"
-                          step="any"
-                          required
-                          value={slotForm.coordinates?.lng || ""}
-                          onChange={(e) =>
-                            setSlotForm({
-                              ...slotForm,
-                              coordinates: {
-                                lat: slotForm.coordinates?.lat || 28.6139,
-                                lng: parseFloat(e.target.value),
-                              },
-                            })
-                          }
-                          className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                          placeholder="e.g., 77.209"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        City
-                      </label>
-                      <input
-                        type="text"
-                        value={slotForm.addressDetails?.city || ""}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            addressDetails: {
-                              ...slotForm.addressDetails,
-                              city: e.target.value,
-                            },
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="Enter city"
-                      />
-                    </div>
-                  </div>
+                  <label className="block text-sm font-medium text-[#EEECF6] mb-2">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={slotForm.location || ""}
+                    onChange={(e) =>
+                      setSlotForm({
+                        ...slotForm,
+                        location: e.target.value,
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
+                    placeholder="Enter location"
+                  />
                 </div>
-
-                {/* Capacity Information */}
                 <div>
-                  <h3 className="text-lg font-semibold text-[#EEECF6] mb-4">
-                    Capacity & Timing
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Total Capacity *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="1"
-                        value={slotForm.capacity || ""}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            capacity: Number(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="Enter total capacity"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Available Slots *
-                      </label>
-                      <input
-                        type="number"
-                        required
-                        min="0"
-                        value={slotForm.availableSlots || ""}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            availableSlots: Number(e.target.value),
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="Enter available slots"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Opening Time
-                      </label>
-                      <input
-                        type="text"
-                        value={slotForm.openingTime || "06:00 AM"}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            openingTime: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="e.g., 06:00 AM"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Closing Time
-                      </label>
-                      <input
-                        type="text"
-                        value={slotForm.closingTime || "11:00 PM"}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            closingTime: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
-                        placeholder="e.g., 11:00 PM"
-                      />
-                    </div>
-                  </div>
+                  <label className="block text-sm font-medium text-[#EEECF6] mb-2">
+                    Price per Hour (₹) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    step="0.01"
+                    value={slotForm.pricePerHour || ""}
+                    onChange={(e) =>
+                      setSlotForm({
+                        ...slotForm,
+                        pricePerHour: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
+                    placeholder="Enter price"
+                  />
                 </div>
-
-                {/* Features */}
                 <div>
-                  <h3 className="text-lg font-semibold text-[#EEECF6] mb-4">
-                    Features & Amenities
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        id="isCovered"
-                        checked={slotForm.isCovered || false}
-                        onChange={(e) =>
-                          setSlotForm({
-                            ...slotForm,
-                            isCovered: e.target.checked,
-                          })
-                        }
-                        className="w-5 h-5 rounded border-[#1B42CB]/30 bg-[#191919]/50 text-[#1B42CB] focus:ring-[#1B42CB]/20"
-                      />
-                      <label htmlFor="isCovered" className="text-[#EEECF6]">
-                        Covered Parking
-                      </label>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-[#EEECF6] mb-2">
-                        Select Features
-                      </label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        {[
-                          "cctv",
-                          "valet",
-                          "ev-charging",
-                          "washroom",
-                          "cafeteria",
-                          "car-wash",
-                          "wheelchair-access",
-                          "air-pump",
-                          "security-guard",
-                        ].map((feature) => (
-                          <div
-                            key={feature}
-                            className="flex items-center gap-2"
-                          >
-                            <input
-                              type="checkbox"
-                              id={`feature-${feature}`}
-                              checked={(slotForm.features || []).includes(
-                                feature
-                              )}
-                              onChange={(e) => {
-                                const currentFeatures = slotForm.features || [];
-                                if (e.target.checked) {
-                                  setSlotForm({
-                                    ...slotForm,
-                                    features: [...currentFeatures, feature],
-                                  });
-                                } else {
-                                  setSlotForm({
-                                    ...slotForm,
-                                    features: currentFeatures.filter(
-                                      (f) => f !== feature
-                                    ),
-                                  });
-                                }
-                              }}
-                              className="w-4 h-4 rounded border-[#1B42CB]/30 bg-[#191919]/50 text-[#1B42CB] focus:ring-[#1B42CB]/20"
-                            />
-                            <label
-                              htmlFor={`feature-${feature}`}
-                              className="text-sm text-[#EEECF6] capitalize"
-                            >
-                              {feature.replace("-", " ")}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <label className="block text-sm font-medium text-[#EEECF6] mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={slotForm.status || "available"}
+                    onChange={(e) =>
+                      setSlotForm({ ...slotForm, status: e.target.value })
+                    }
+                    className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
+                  >
+                    <option value="available">Available</option>
+                    <option value="occupied">Occupied</option>
+                    <option value="maintenance">Maintenance</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#EEECF6] mb-2">
+                    Total Capacity *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={slotForm.capacity || ""}
+                    onChange={(e) =>
+                      setSlotForm({
+                        ...slotForm,
+                        capacity: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
+                    placeholder="Enter total capacity"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#EEECF6] mb-2">
+                    Available Slots *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={slotForm.availableSlots || ""}
+                    onChange={(e) =>
+                      setSlotForm({
+                        ...slotForm,
+                        availableSlots: Number(e.target.value),
+                      })
+                    }
+                    className="w-full px-4 py-3 bg-[#191919]/50 border border-[#1B42CB]/30 rounded-xl text-[#EEECF6] focus:outline-none focus:border-[#1B42CB] focus:ring-2 focus:ring-[#1B42CB]/20 transition-all duration-300"
+                    placeholder="Enter available slots"
+                  />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-6 border-t border-[#1B42CB]/20">
+              <div className="flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     setShowSlotForm(false);
-                    setSlotForm({
-                      status: "available",
-                      capacity: 50,
-                      availableSlots: 50,
-                      pricePerHour: 50,
-                      isCovered: false,
-                      securityLevel: "medium",
-                      openingTime: "06:00 AM",
-                      closingTime: "11:00 PM",
-                      features: [],
-                      coordinates: { lat: 28.6139, lng: 77.209 },
-                    });
+                    setSlotForm({});
                     setEditingSlotId(null);
                   }}
                   className="px-6 py-3 bg-[#191919] border border-[#1B42CB]/30 text-[#EEECF6] font-semibold rounded-xl hover:bg-[#1B42CB]/10 transition-all duration-300"
