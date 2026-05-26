@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import {
   Search,
   Edit,
@@ -88,23 +89,15 @@ export default function AdminPanel() {
     id: string;
     name: string;
   } | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
-  // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    setTheme(mediaQuery.matches ? "light" : "dark");
-
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "light" : "dark");
-    };
-
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
-
+ 
   const { token } = useAuth();
   const API = import.meta.env.VITE_API_URL;
+
+ // Detect system theme
+  const { theme } = useTheme();
+
+
 
   // Theme-based classes
   const themeClasses = {

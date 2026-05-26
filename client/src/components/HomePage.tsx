@@ -2,26 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import MapComponent from "./MapComponent";
 import * as Icons from "lucide-react";
+import { useTheme } from "../context/ThemeContext";
 
 const HomePage: React.FC = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [parkingSlots, setParkingSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
-  // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    setTheme(mediaQuery.matches ? "light" : "dark");
 
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "light" : "dark");
-    };
+ // Detect system theme
+  const { theme } = useTheme();
 
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
 
   interface ParkingSlot {
     [key: string]: unknown;

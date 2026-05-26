@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import * as Icons from "lucide-react";
-
+import { useTheme } from "../context/ThemeContext";
 interface ParkingSlot {
   _id: string;
   name?: string;
@@ -35,20 +35,12 @@ const BookedSlotsPage: React.FC = () => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
 
-  // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    setTheme(mediaQuery.matches ? 'light' : 'dark');
+  
+ // Detect system theme
+  const { theme } = useTheme();
 
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? 'light' : 'dark');
-    };
-    
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
+
 
   const { token, user } = useAuth();
   const receiptRef = useRef<HTMLDivElement>(null);

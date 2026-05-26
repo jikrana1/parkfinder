@@ -1,6 +1,8 @@
 // DashboardPage.tsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -78,22 +80,12 @@ const DashboardPage: React.FC = () => {
   const [timeframe, setTimeframe] = useState<"week" | "month" | "year">(
     "month",
   );
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const { token } = useAuth();
+
   const API = import.meta.env.VITE_API_URL;
 
   // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    setTheme(mediaQuery.matches ? 'light' : 'dark');
-
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? 'light' : 'dark');
-    };
-    
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
+  const { theme } = useTheme();
 
   useEffect(() => {
     fetchDashboardData();

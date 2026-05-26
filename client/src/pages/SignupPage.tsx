@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import {
   Eye,
   EyeOff,
@@ -38,22 +39,13 @@ export default function SignupPage() {
   const [showAdminSecret, setShowAdminSecret] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   const navigate = useNavigate();
 
   // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    setTheme(mediaQuery.matches ? "light" : "dark");
-
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "light" : "dark");
-    };
-
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
+   const { theme } = useTheme();
+ 
+ 
 
   // Theme-based classes
   const getThemeClasses = () => {

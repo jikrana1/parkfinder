@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 import {
   Eye,
   EyeOff,
@@ -17,22 +18,14 @@ export default function LoginPage() {
   const [msg, setMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  // const [theme, setTheme] = useState<"light" | "dark">("dark");
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    setTheme(mediaQuery.matches ? "light" : "dark");
-
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? "light" : "dark");
-    };
-
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
-  }, []);
+   // Detect system theme
+    const { theme } = useTheme();
+  
+  
 
   // Theme-based classes
   const getThemeClasses = () => {

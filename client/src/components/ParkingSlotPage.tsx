@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Icons from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
 interface ParkingSlot {
   _id: string;
@@ -37,7 +38,8 @@ const mockCoordinates = [
 
 const ParkingSlotPage: React.FC = () => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+
+  // const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [parkingSlots, setParkingSlots] = useState<ParkingSlot[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -59,17 +61,8 @@ const ParkingSlotPage: React.FC = () => {
   const API = import.meta.env.VITE_API_URL;
 
   // Detect system theme
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
-    setTheme(mediaQuery.matches ? 'light' : 'dark');
+  const { theme } = useTheme();
 
-    const handler = (e: MediaQueryListEvent) => {
-      setTheme(e.matches ? 'light' : 'dark');
-    };
-    
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
 
   // Theme-based classes
   const getThemeClasses = () => {
