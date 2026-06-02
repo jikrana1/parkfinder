@@ -100,9 +100,9 @@ const Navbar: React.FC = () => {
       {/* Navbar */}
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-gradient-to-br ${
-          theme === 'light' 
-            ? 'from-gray-50 via-white to-gray-50' 
-            : 'from-[#191919] via-[#0f0f0f] to-[#191919]'
+          theme === "light"
+            ? "from-gray-50 via-white to-gray-50"
+            : "from-[#191919] via-[#0f0f0f] to-[#191919]"
         } ${themeClasses.navBg}`}
       >
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -112,15 +112,18 @@ const Navbar: React.FC = () => {
               <img
                 src="/logo.png"
                 alt="SmartPark"
-                className="h-11 md:h-15 w-auto object-contain transition-all duration-300 group-hover:scale-110"
+                className="h-11 md:h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
                 style={{
-                  filter: theme === 'light'
-                    ? "drop-shadow(0 0 8px rgba(27,66,203,0.3))"
-                    : "brightness(0) invert(1) drop-shadow(0 0 8px rgba(27,66,203,0.5))",
+                  filter:
+                    theme === "light"
+                      ? "brightness(0)"
+                      : "brightness(0) invert(1)",
                 }}
               />
               {/* Glow Effect */}
-              <div className={`absolute inset-0 bg-gradient-to-r ${themeClasses.gradient.accent} rounded-full blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 -z-10`}></div>
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${themeClasses.gradient.accent} rounded-full blur-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-300 -z-10`}
+              ></div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -140,12 +143,16 @@ const Navbar: React.FC = () => {
                     <IconComponent className="w-4 h-4" />
                     <span className="relative z-10">{item.name}</span>
                     {isActive(item.path) && (
-                      <div className={`absolute inset-0 border ${themeClasses.border} rounded-xl`}></div>
+                      <div
+                        className={`absolute inset-0 border ${themeClasses.border} rounded-xl`}
+                      ></div>
                     )}
                     {!isActive(item.path) && (
                       <div className="absolute inset-0 border border-transparent group-hover:border-[#1B42CB]/20 rounded-xl transition-all duration-300"></div>
                     )}
-                    <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r ${themeClasses.gradient.accent} group-hover:w-3/4 transition-all duration-300`}></div>
+                    <div
+                      className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r ${themeClasses.gradient.accent} group-hover:w-3/4 transition-all duration-300`}
+                    ></div>
                   </Link>
                 );
               })}
@@ -159,22 +166,26 @@ const Navbar: React.FC = () => {
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className={`flex items-center space-x-3 px-4 py-2 rounded-xl ${
-                      theme === 'light' 
-                        ? 'bg-gray-100 border-gray-200 hover:bg-gray-200' 
-                        : 'bg-[#191919] border-[#1B42CB]/30 hover:bg-[#1B42CB]/10'
+                      theme === "light"
+                        ? "bg-gray-100 border-gray-200 hover:bg-gray-200"
+                        : "bg-[#191919] border-[#1B42CB]/30 hover:bg-[#1B42CB]/10"
                     } border transition-all duration-300 cursor-pointer`}
                   >
                     <div className="flex items-center justify-center gap-2">
-                      <Icons.User className={`w-4 h-4 ${themeClasses.textSecondary}`} />
-                      <span className={`font-medium text-sm ${themeClasses.text}`}>
+                      <Icons.User
+                        className={`w-4 h-4 ${themeClasses.textSecondary}`}
+                      />
+                      <span
+                        className={`font-medium text-sm ${themeClasses.text}`}
+                      >
                         {user.name?.toUpperCase() || "USER"}
                       </span>
                     </div>
 
-                    <Icons.ChevronDown 
+                    <Icons.ChevronDown
                       className={`w-4 h-4 ${themeClasses.textSecondary} transition-transform duration-300 ${
                         isDropdownOpen ? "rotate-180" : ""
-                      }`} 
+                      }`}
                     />
                   </button>
 
@@ -185,16 +196,24 @@ const Navbar: React.FC = () => {
                         className="fixed inset-0"
                         onClick={() => setIsDropdownOpen(false)}
                       ></div>
-                      <div className={`absolute right-0 mt-2 w-48 rounded-xl backdrop-blur-xl ${
-                        theme === 'light' 
-                          ? 'bg-white/95 border-gray-200' 
-                          : 'bg-[#191919]/95 border-[#1B42CB]/30'
-                      } border shadow-lg overflow-hidden z-50`}>
-                        <div className={`px-4 py-3 border-b ${themeClasses.border}`}>
-                          <div className={`text-sm font-medium ${themeClasses.text}`}>
+                      <div
+                        className={`absolute right-0 mt-2 w-48 rounded-xl backdrop-blur-xl ${
+                          theme === "light"
+                            ? "bg-white/95 border-gray-200"
+                            : "bg-[#191919]/95 border-[#1B42CB]/30"
+                        } border shadow-lg overflow-hidden z-50`}
+                      >
+                        <div
+                          className={`px-4 py-3 border-b ${themeClasses.border}`}
+                        >
+                          <div
+                            className={`text-sm font-medium ${themeClasses.text}`}
+                          >
                             {user.name}
                           </div>
-                          <div className={`text-xs ${themeClasses.textSecondary}`}>
+                          <div
+                            className={`text-xs ${themeClasses.textSecondary}`}
+                          >
                             {user.role === "admin" ? "Administrator" : "User"}
                           </div>
                         </div>
@@ -214,9 +233,9 @@ const Navbar: React.FC = () => {
                   <button
                     onClick={() => navigate("/login")}
                     className={`px-4 py-2 rounded-xl ${
-                      theme === 'light'
-                        ? 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
-                        : 'bg-[#191919] border-[#1B42CB]/30 text-[#EEECF6] hover:bg-[#1B42CB]/10'
+                      theme === "light"
+                        ? "bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200"
+                        : "bg-[#191919] border-[#1B42CB]/30 text-[#EEECF6] hover:bg-[#1B42CB]/10"
                     } border flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer`}
                   >
                     <Icons.LogIn className="w-4 h-4" />
@@ -237,9 +256,9 @@ const Navbar: React.FC = () => {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`md:hidden w-10 h-10 rounded-xl ${
-                theme === 'light'
-                  ? 'bg-gray-100 border-gray-200'
-                  : 'bg-[#191919] border-[#1B42CB]/30'
+                theme === "light"
+                  ? "bg-gray-100 border-gray-200"
+                  : "bg-[#191919] border-[#1B42CB]/30"
               } border flex items-center justify-center ${themeClasses.text}`}
             >
               {isMobileMenuOpen ? (
@@ -253,11 +272,13 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className={`md:hidden backdrop-blur-xl ${
-            theme === 'light'
-              ? 'bg-white/95 border-gray-200'
-              : 'bg-[#191919]/95 border-[#1B42CB]/20'
-          } border-t`}>
+          <div
+            className={`md:hidden backdrop-blur-xl ${
+              theme === "light"
+                ? "bg-white/95 border-gray-200"
+                : "bg-[#191919]/95 border-[#1B42CB]/20"
+            } border-t`}
+          >
             <div className="px-4 pt-2 pb-4 space-y-1">
               {navItems.map((item) => {
                 const IconComponent = item.icon;
@@ -283,7 +304,9 @@ const Navbar: React.FC = () => {
                   <>
                     {/* User Info */}
                     <div className="flex items-center space-x-3 px-4 py-3 mb-3">
-                      <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${themeClasses.gradient.accent} flex items-center justify-center`}>
+                      <div
+                        className={`w-10 h-10 rounded-full bg-gradient-to-br ${themeClasses.gradient.accent} flex items-center justify-center`}
+                      >
                         <span className="text-white font-medium">
                           {user.name?.charAt(0).toUpperCase() || "U"}
                         </span>
@@ -292,7 +315,9 @@ const Navbar: React.FC = () => {
                         <div className={`font-medium ${themeClasses.text}`}>
                           {user.name}
                         </div>
-                        <div className={`text-xs ${themeClasses.textSecondary}`}>
+                        <div
+                          className={`text-xs ${themeClasses.textSecondary}`}
+                        >
                           {user.role === "admin" ? "Administrator" : "User"}
                         </div>
                       </div>
@@ -302,9 +327,9 @@ const Navbar: React.FC = () => {
                     <button
                       onClick={handleLogout}
                       className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl ${
-                        theme === 'light'
-                          ? 'bg-gray-100 border-gray-200'
-                          : 'bg-[#191919] border-[#FF2F6C]/30'
+                        theme === "light"
+                          ? "bg-gray-100 border-gray-200"
+                          : "bg-[#191919] border-[#FF2F6C]/30"
                       } border text-[#FF2F6C] font-medium hover:bg-[#FF2F6C]/10 transition-all duration-300`}
                     >
                       <Icons.LogOut className="w-4 h-4" />
@@ -320,9 +345,9 @@ const Navbar: React.FC = () => {
                         setIsMobileMenuOpen(false);
                       }}
                       className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl ${
-                        theme === 'light'
-                          ? 'bg-gray-100 border-gray-200 text-gray-700'
-                          : 'bg-[#191919] border-[#1B42CB]/30 text-[#EEECF6]'
+                        theme === "light"
+                          ? "bg-gray-100 border-gray-200 text-gray-700"
+                          : "bg-[#191919] border-[#1B42CB]/30 text-[#EEECF6]"
                       } border font-medium hover:bg-[#1B42CB]/10 transition-all duration-300 mb-2`}
                     >
                       <Icons.LogIn className="w-4 h-4" />
