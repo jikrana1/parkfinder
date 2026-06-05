@@ -13,6 +13,20 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
+// Validate critical environment variables at startup
+const requiredEnvVars = ["JWT_SECRET", "ADMIN_SECRET"];
+const missingEnvVars = requiredEnvVars.filter(
+  (envVar) => !process.env[envVar]
+);
+
+if (missingEnvVars.length > 0) {
+  console.error(
+    `❌ FATAL ERROR: Missing required environment variables: ${missingEnvVars.join(", ")}`
+  );
+  console.error("   Please set these in your .env file or system environment.");
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(

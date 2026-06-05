@@ -12,7 +12,7 @@ export const signup =  async (req, res) => {
 
     // Prevent random users from creating admin
     if (role === "admin") {
-      if (adminSecret !== "SUPERADMIN123") {
+      if (adminSecret !== process.env.ADMIN_SECRET) {
         return res.json({
           success: false,
           message: "Invalid Admin Secret Key",
@@ -49,7 +49,7 @@ export const login = async (req, res) => {
     if (!isMatch)
       return res.json({ success: false, message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user._id, role: user.role }, "MY_SECRET_KEY", {
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
 

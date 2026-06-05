@@ -13,7 +13,7 @@ export const authMiddleware = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, "MY_SECRET_KEY");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // Find user in database
     const user = await User.findById(decoded.id).select("-password");
