@@ -8,12 +8,17 @@ const userSchema = new mongoose.Schema({
   role: { type: String, default: "user" },
   resetToken: String,
   resetTokenExpiry: Date,
+  favorites: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parking",
+    },
+  ],
 });
 
 // Password hashing
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
-
   this.password = await bcrypt.hash(this.password, 10);
 });
 
