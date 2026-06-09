@@ -18,6 +18,8 @@ const rawData = [
     rating: 4.5,
     openingTime: "08:00 AM",
     closingTime: "11:00 PM",
+    floor: "Level 1",
+    slotNumber: "A-12",
   },
   {
     name: "Metro Parking Space",
@@ -32,6 +34,8 @@ const rawData = [
     rating: 4.0,
     openingTime: "06:00 AM",
     closingTime: "10:00 PM",
+    floor: "Ground Floor",
+    slotNumber: "B-07",
   },
   {
     name: "Mall Basement Parking",
@@ -46,6 +50,8 @@ const rawData = [
     rating: 4.8,
     openingTime: "24 Hours",
     closingTime: "24 Hours",
+    floor: "Basement 2",
+    slotNumber: "C-34",
   },
   {
     name: "Central Park Parking",
@@ -60,6 +66,8 @@ const rawData = [
     rating: 3.9,
     openingTime: "07:00 AM",
     closingTime: "09:00 PM",
+    floor: "Ground Floor",
+    slotNumber: "D-05",
   },
   {
     name: "Airport Multi-Level Parking",
@@ -74,6 +82,8 @@ const rawData = [
     rating: 4.7,
     openingTime: "24 Hours",
     closingTime: "24 Hours",
+    floor: "Level 3",
+    slotNumber: "E-21",
   },
   {
     name: "Tech Park Parking",
@@ -88,6 +98,8 @@ const rawData = [
     rating: 4.2,
     openingTime: "09:00 AM",
     closingTime: "08:00 PM",
+    floor: "Level 1",
+    slotNumber: "F-18",
   },
   {
     name: "Railway Station Parking",
@@ -102,6 +114,8 @@ const rawData = [
     rating: 4.1,
     openingTime: "24 Hours",
     closingTime: "24 Hours",
+    floor: "Ground Floor",
+    slotNumber: "G-02",
   },
   {
     name: "IT Hub Parking Lot",
@@ -116,6 +130,8 @@ const rawData = [
     rating: 4.4,
     openingTime: "06:00 AM",
     closingTime: "12:00 AM",
+    floor: "Level 2",
+    slotNumber: "H-09",
   },
   {
     name: "Community Center Parking",
@@ -130,6 +146,8 @@ const rawData = [
     rating: 3.5,
     openingTime: "08:00 AM",
     closingTime: "09:00 PM",
+    floor: "Ground Floor",
+    slotNumber: "I-14",
   },
   {
     name: "Techno Mall Parking",
@@ -144,6 +162,8 @@ const rawData = [
     rating: 4.3,
     openingTime: "10:00 AM",
     closingTime: "11:00 PM",
+    floor: "Basement 1",
+    slotNumber: "J-27",
   },
   {
     name: "Harbour View Parking",
@@ -158,6 +178,8 @@ const rawData = [
     rating: 4.6,
     openingTime: "07:00 AM",
     closingTime: "10:00 PM",
+    floor: "Level 2",
+    slotNumber: "K-03",
   },
   {
     name: "Stadium Parking Zone",
@@ -172,6 +194,8 @@ const rawData = [
     rating: 4.5,
     openingTime: "06:00 AM",
     closingTime: "11:00 PM",
+    floor: "Ground Floor",
+    slotNumber: "L-41",
   },
   {
     name: "City Mall Roof Parking",
@@ -186,6 +210,8 @@ const rawData = [
     rating: 4.0,
     openingTime: "09:00 AM",
     closingTime: "11:00 PM",
+    floor: "Rooftop",
+    slotNumber: "M-16",
   },
   {
     name: "Business Tower Parking",
@@ -200,6 +226,8 @@ const rawData = [
     rating: 4.7,
     openingTime: "08:00 AM",
     closingTime: "10:00 PM",
+    floor: "Level 4",
+    slotNumber: "N-08",
   },
   {
     name: "Local Market Parking",
@@ -214,6 +242,8 @@ const rawData = [
     rating: 3.8,
     openingTime: "09:00 AM",
     closingTime: "09:00 PM",
+    floor: "Ground Floor",
+    slotNumber: "O-22",
   },
 ];
 

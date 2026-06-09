@@ -1,6 +1,57 @@
 import Booking from "../models/Booking.js";
 import ParkingLog from "../models/ParkingLog.js";
 
+// GET /api/dashboard/active-booking
+// Returns the user's most recent active booking with full parking details
+// Used by the Parked Vehicle Location Reminder widget on the dashboard
+export const getActiveBooking = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const activeBookings = await Booking.find({
+      userId,
+      bookingStatus: "active",
+    })
+      .populate("parkingId")
+      .sort({ bookingDate: -1 });
+
+    if (!activeBookings.length) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const data = activeBookings.map((booking) => {
+      const bookedAt = new Date(booking.bookingDate);
+      const expectedEnd = new Date(
+        bookedAt.getTime() + booking.duration * 60 * 60 * 1000
+      );
+      return {
+        bookingId: booking._id,
+        bookingDate: booking.bookingDate,
+        duration: booking.duration,
+        totalPrice: booking.totalPrice,
+        expectedEnd,
+        parking: {
+          id: booking.parkingId?._id,
+          name: booking.parkingId?.name,
+          location: booking.parkingId?.location,
+          floor: booking.parkingId?.floor || "Ground Floor",
+          slotNumber: booking.parkingId?.slotNumber || "N/A",
+          isCovered: booking.parkingId?.isCovered,
+          securityLevel: booking.parkingId?.securityLevel,
+        },
+      };
+    });
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error("Active booking fetch error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch active bookings",
+    });
+  }
+};
+
 export const userStats = async (req, res) => {
   try {
     const userId = req.user._id;

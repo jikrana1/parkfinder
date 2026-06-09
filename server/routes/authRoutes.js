@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { authMiddleware } from "../middleware/auth.js";
 import { sendPasswordResetEmail } from "../utils/email.js";
+import { signup, login, verify } from "../controllers/auth.controller.js"; 
 
 const router = express.Router();
 

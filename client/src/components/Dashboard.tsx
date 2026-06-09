@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 import {
   Chart as ChartJS,
@@ -73,8 +74,27 @@ interface DashboardStats {
   }[];
 }
 
+interface ActiveBooking {
+  bookingId: string;
+  bookingDate: string;
+  duration: number;
+  totalPrice: number;
+  expectedEnd: string;
+  parking: {
+    id: string;
+    name: string;
+    location: string;
+    floor: string;
+    slotNumber: string;
+    isCovered: boolean;
+    securityLevel: string;
+  };
+}
+
 const DashboardPage: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [activeBooking, setActiveBooking] = useState<ActiveBooking[]>([]);
+  const [activeBookingIndex, setActiveBookingIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -83,6 +103,7 @@ const DashboardPage: React.FC = () => {
   );
   const [favorites, setFavorites] = useState<any[]>([]);
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_URL;
 
@@ -132,8 +153,24 @@ const DashboardPage: React.FC = () => {
 
     setIsAuthenticated(true);
     fetchDashboardData();
+    fetchActiveBooking();
     fetchFavorites(); // Fetch favorites alongside stats
   }, [timeframe, token]);
+
+  const fetchActiveBooking = async () => {
+    try {
+      const res = await fetch(`${API}/api/dashboard/active-booking`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        setActiveBooking(data.data ?? []);
+        setActiveBookingIndex(0);
+      }
+    } catch {
+      // Non-critical — widget simply won't show if this fails
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -487,6 +524,149 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
         </header>
+
+        {/* Parked Vehicle Location Reminder */}
+        {activeBooking.length > 0 && (() => {
+          const booking = activeBooking[activeBookingIndex];
+          return (
+          <div className="mb-8">
+            <div className={`relative overflow-hidden backdrop-blur-xl border rounded-2xl p-6 shadow-xl
+              ${theme === 'light'
+                ? 'bg-green-50 border-green-200 shadow-green-100'
+                : 'bg-green-500/10 border-green-500/30 shadow-green-500/10'
+              }`}>
+
+              {/* Pulse indicator */}
+              <div className="absolute top-4 right-4 flex items-center gap-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                <span className={`text-sm font-semibold ${theme === 'light' ? 'text-green-700' : 'text-green-400'}`}>
+                  Active Parking
+                </span>
+              </div>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
+                  <Icons.MapPin className="w-6 h-6 text-green-500" />
+                </div>
+                <div>
+                  <h2 className={`text-xl font-bold ${themeClasses.text}`}>
+                    {activeBooking.length > 1
+                      ? `Your Vehicles are Parked (${activeBooking.length} active bookings)`
+                      : "Your Vehicle is Parked Here"}
+                  </h2>
+                  <p className={`text-sm ${themeClasses.textSecondary}`}>
+                    Quick location reminder for your active booking
+                    {activeBooking.length > 1 && ` — showing ${activeBookingIndex + 1} of ${activeBooking.length}`}
+                  </p>
+                </div>
+              </div>
+
+              {/* Location Details Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
+                <div className={`rounded-xl p-4 ${theme === 'light' ? 'bg-white border border-green-200' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icons.Building2 className="w-4 h-4 text-green-500" />
+                    <span className={`text-xs font-medium uppercase tracking-wide ${themeClasses.textMuted}`}>Facility</span>
+                  </div>
+                  <p className={`font-bold ${themeClasses.text} text-sm leading-tight`}>{booking.parking.name}</p>
+                </div>
+
+                <div className={`rounded-xl p-4 ${theme === 'light' ? 'bg-white border border-green-200' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icons.Layers className="w-4 h-4 text-green-500" />
+                    <span className={`text-xs font-medium uppercase tracking-wide ${themeClasses.textMuted}`}>Floor</span>
+                  </div>
+                  <p className={`font-bold ${themeClasses.text} text-sm`}>{booking.parking.floor}</p>
+                </div>
+
+                <div className={`rounded-xl p-4 ${theme === 'light' ? 'bg-white border border-green-200' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icons.Hash className="w-4 h-4 text-green-500" />
+                    <span className={`text-xs font-medium uppercase tracking-wide ${themeClasses.textMuted}`}>Slot No.</span>
+                  </div>
+                  <p className="font-bold text-green-500 text-lg">{booking.parking.slotNumber}</p>
+                </div>
+
+                <div className={`rounded-xl p-4 ${theme === 'light' ? 'bg-white border border-green-200' : 'bg-green-500/10 border border-green-500/20'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icons.Clock className="w-4 h-4 text-green-500" />
+                    <span className={`text-xs font-medium uppercase tracking-wide ${themeClasses.textMuted}`}>Until</span>
+                  </div>
+                  <p className={`font-bold ${themeClasses.text} text-sm`}>
+                    {new Date(booking.expectedEnd).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </div>
+
+              {/* Footer: address, badges, navigation */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className={`flex items-center gap-2 text-sm ${themeClasses.textSecondary}`}>
+                  <Icons.Navigation className="w-4 h-4" />
+                  <span>{booking.parking.location}</span>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  {booking.parking.isCovered && (
+                    <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium
+                      ${theme === 'light' ? 'bg-blue-100 text-blue-700' : 'bg-blue-500/20 text-blue-300'}`}>
+                      <Icons.Umbrella className="w-3 h-3" />
+                      Covered
+                    </span>
+                  )}
+                  <span className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium capitalize
+                    ${booking.parking.securityLevel === 'high'
+                      ? (theme === 'light' ? 'bg-green-100 text-green-700' : 'bg-green-500/20 text-green-300')
+                      : booking.parking.securityLevel === 'medium'
+                      ? (theme === 'light' ? 'bg-yellow-100 text-yellow-700' : 'bg-yellow-500/20 text-yellow-300')
+                      : (theme === 'light' ? 'bg-red-100 text-red-700' : 'bg-red-500/20 text-red-300')
+                    }`}>
+                    <Icons.Shield className="w-3 h-3" />
+                    {booking.parking.securityLevel} security
+                  </span>
+
+                  {/* Carousel controls — only shown when multiple bookings */}
+                  {activeBooking.length > 1 && (
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setActiveBookingIndex(i => Math.max(0, i - 1))}
+                        disabled={activeBookingIndex === 0}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        aria-label="Previous booking"
+                      >
+                        <Icons.ChevronLeft className={`w-4 h-4 ${themeClasses.text}`} />
+                      </button>
+                      <span className={`text-xs font-medium px-2 ${themeClasses.textSecondary}`}>
+                        {activeBookingIndex + 1} / {activeBooking.length}
+                      </span>
+                      <button
+                        onClick={() => setActiveBookingIndex(i => Math.min(activeBooking.length - 1, i + 1))}
+                        disabled={activeBookingIndex === activeBooking.length - 1}
+                        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                        aria-label="Next booking"
+                      >
+                        <Icons.ChevronRight className={`w-4 h-4 ${themeClasses.text}`} />
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => navigate("/bookings")}
+                    className="flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium
+                      bg-gradient-to-r from-[#1B42CB] to-[#1B42CB]/80 text-white hover:opacity-90 transition-opacity"
+                  >
+                    <Icons.ExternalLink className="w-3 h-3" />
+                    View Booking{activeBooking.length > 1 ? "s" : ""}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          );
+        })()}
 
         {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

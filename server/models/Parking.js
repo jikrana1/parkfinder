@@ -13,6 +13,8 @@ const parkingSchema = new mongoose.Schema({
   rating: Number,
   openingTime: String,
   closingTime: String,
+  floor: { type: String, default: "Ground Floor" },
+  slotNumber: { type: String, default: null },
   emergencyContact: {
     phone: String,
     supportEmail: String,
