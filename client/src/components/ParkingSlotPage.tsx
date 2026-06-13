@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as Icons from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -6,12 +7,12 @@ import { useTheme } from "../context/ThemeContext";
 import PredictionPanel from "./PredictionPanel";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import * as L from "leaflet";
 import { useRouteNavigation } from "../hooks/useRouteNavigation";
 import { getUserLocation } from "../utils/geolocation";
 
 // Fix for default Leaflet icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
@@ -48,7 +49,7 @@ interface FitBoundsProps {
   coords: [number, number][];
 }
 
-const FitBounds: React.FC<FitBoundsProps> = ({ coords }) => {
+const FitBounds: React.FC<FitBoundsProps> = ({ coords }: FitBoundsProps) => {
   const map = useMap();
   useEffect(() => {
     if (coords && coords.length > 1) {
@@ -107,9 +108,12 @@ const mockCoordinates = [
 const ImageCarousel: React.FC<{ images: string[]; name: string }> = ({
   images,
   name,
+}: {
+  images: string[];
+  name: string;
 }) => {
-  const [current, setCurrent] = React.useState(0);
-  const [loaded, setLoaded] = React.useState(false);
+  const [current, setCurrent] = React.useState<number>(0);
+  const [loaded, setLoaded] = React.useState<boolean>(false);
 
   if (!images || images.length === 0) {
     return (
@@ -127,12 +131,12 @@ const ImageCarousel: React.FC<{ images: string[]; name: string }> = ({
   const prev = (e: React.MouseEvent) => {
     e.stopPropagation();
     setLoaded(false);
-    setCurrent((c) => (c - 1 + images.length) % images.length);
+    setCurrent((c: number) => (c - 1 + images.length) % images.length);
   };
   const next = (e: React.MouseEvent) => {
     e.stopPropagation();
     setLoaded(false);
-    setCurrent((c) => (c + 1) % images.length);
+    setCurrent((c: number) => (c + 1) % images.length);
   };
 
   return (
@@ -169,10 +173,10 @@ const ImageCarousel: React.FC<{ images: string[]; name: string }> = ({
           </button>
           {/* Dot indicators */}
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {images.map((_, i) => (
+            {images.map((_: string, i: number) => (
               <button
                 key={i}
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent) => {
                   e.stopPropagation();
                   setLoaded(false);
                   setCurrent(i);
@@ -205,6 +209,8 @@ const ParkingSlotPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>("");
   /** When true, only EV-charging-enabled slots are fetched from the API */
   const [evFilter, setEvFilter] = useState<boolean>(false);
+  const vehicleTypes = ["All", "Car", "Bike", "EV"];
+  const [vehicleFilter, setVehicleFilter] = useState<string>("All");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [selectedMapSlot, setSelectedMapSlot] = useState<ParkingSlot | null>(
     null,
@@ -607,6 +613,15 @@ const ParkingSlotPage: React.FC = () => {
       filtered = filtered.filter((slot) => slot.isEVChargingStation === true);
     }
 
+    if (vehicleFilter && vehicleFilter !== "All") {
+      filtered = filtered.filter((slot) => {
+        if (vehicleFilter === "EV") {
+          return slot.isEVChargingStation || (slot.supportedVehicles && slot.supportedVehicles.includes("EV"));
+        }
+        return slot.supportedVehicles && slot.supportedVehicles.includes(vehicleFilter);
+      });
+    }
+
     if (sortBy) {
       switch (sortBy) {
         case "price":
@@ -635,7 +650,7 @@ const ParkingSlotPage: React.FC = () => {
     }
 
     return filtered;
-  }, [parkingSlots, searchTerm, statusFilter, sortBy, userLocation, evFilter]);
+  }, [parkingSlots, searchTerm, statusFilter, sortBy, userLocation, evFilter, vehicleFilter]);
 
   // Render Map View
   const renderMapView = () => {
@@ -715,20 +730,23 @@ const ParkingSlotPage: React.FC = () => {
               )}
 
               {/* Parking slots markers */}
-              {filteredAndSortedSlots.map((slot) => {
+              {filteredAndSortedSlots.map((slot: ParkingSlot) => {
                 if (!slot.coordinates) return null;
                 const status = slot.status || "unknown";
 
                 return (
                   <Marker
-                    key={slot._id}
-                    position={[slot.coordinates.lat, slot.coordinates.lng]}
-                    icon={createParkingIcon(status)}
-                    eventHandlers={{
-                      click: () => {
-                        setSelectedMapSlot(slot);
-                      },
-                    }}
+                    {...{
+                      key: slot._id,
+                      position: [slot.coordinates.lat, slot.coordinates.lng],
+                      icon: createParkingIcon(status),
+                      eventHandlers: {
+                        click: () => {
+                          setSelectedMapSlot(slot);
+                        },
+                      }
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    } as any}
                   >
                     <Popup>
                       <div className="p-2 min-w-[200px] text-gray-800">
@@ -765,10 +783,13 @@ const ParkingSlotPage: React.FC = () => {
               {routeCoords.length > 0 && (
                 <>
                   <Polyline
-                    positions={routeCoords}
-                    pathOptions={{ color: "#1B42CB", weight: 5 }}
-                    color="#1B42CB"
-                    weight={5}
+                    {...{
+                      positions: routeCoords,
+                      pathOptions: { color: "#1B42CB", weight: 5 },
+                      color: "#1B42CB",
+                      weight: 5
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    } as any}
                   />
                   <FitBounds coords={routeCoords} />
                 </>
@@ -940,7 +961,7 @@ const ParkingSlotPage: React.FC = () => {
   const renderListView = () => {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAndSortedSlots.map((slot) => {
+        {filteredAndSortedSlots.map((slot: ParkingSlot) => {
           const availabilityPercentage = getAvailabilityPercentage(
             slot.availableSlots,
             slot.capacity,
@@ -1048,7 +1069,7 @@ const ParkingSlotPage: React.FC = () => {
                 {slot.supportedVehicles &&
                   slot.supportedVehicles.length > 0 && (
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {slot.supportedVehicles.map((v) => (
+                      {slot.supportedVehicles.map((v: string) => (
                         <span
                           key={v}
                           className={`text-xs px-3 py-1 rounded-full ${themeClasses.cardBgSecondary} border ${themeClasses.border} ${themeClasses.text} font-medium flex items-center gap-1`}
@@ -1591,7 +1612,7 @@ const ParkingSlotPage: React.FC = () => {
                   >
                     {
                       filteredAndSortedSlots.filter(
-                        (s) => s.status === "available",
+                        (s: ParkingSlot) => s.status === "available",
                       ).length
                     }
                   </div>
@@ -1606,7 +1627,7 @@ const ParkingSlotPage: React.FC = () => {
                     {filteredAndSortedSlots.length > 0
                       ? Math.round(
                           (filteredAndSortedSlots.reduce(
-                            (sum, s) => sum + s.availableSlots / s.capacity,
+                            (sum: number, s: ParkingSlot) => sum + s.availableSlots / s.capacity,
                             0,
                           ) /
                             filteredAndSortedSlots.length) *
@@ -1627,7 +1648,7 @@ const ParkingSlotPage: React.FC = () => {
                     {filteredAndSortedSlots.length > 0
                       ? Math.round(
                           filteredAndSortedSlots.reduce(
-                            (sum, s) => sum + s.pricePerHour,
+                            (sum: number, s: ParkingSlot) => sum + s.pricePerHour,
                             0,
                           ) / filteredAndSortedSlots.length,
                         )

@@ -1,20 +1,23 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-  role: { type: String, default: "user" },
-  resetToken: String,
-  resetTokenExpiry: Date,
-  favorites: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Parking",
-    },
-  ],
-});
+const userSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: { type: String, unique: true },
+    password: String,
+    role: { type: String, default: "user" },
+    resetToken: String,
+    resetTokenExpiry: Date,
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Parking",
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 // Password hashing
 userSchema.pre("save", async function () {

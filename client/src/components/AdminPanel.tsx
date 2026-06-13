@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import AnalyticsPanel from "./AnalyticsPanel";
 import {
   Search,
   Edit,
@@ -22,6 +24,7 @@ import {
   Shield,
   Zap,
   RefreshCw,
+  BarChart3,
 } from "lucide-react";
 
 interface ParkingSlot {
@@ -64,7 +67,7 @@ interface Booking {
   bookingStatus: "active" | "cancelled" | "completed";
 }
 
-type TabType = "parking" | "users" | "bookings";
+type TabType = "parking" | "users" | "bookings" | "analytics";
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<TabType>("parking");
@@ -696,6 +699,22 @@ export default function AdminPanel() {
                 <RefreshCw className="w-4 h-4 relative z-10 animate-spin" />
               )}
             </button>
+            <button
+              onClick={() => setActiveTab("analytics")}
+              className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden group ${
+                activeTab === "analytics"
+                  ? "text-white"
+                  : `${currentTheme.textSecondary} hover:${currentTheme.text}`
+              }`}
+            >
+              {activeTab === "analytics" && (
+                <div className="absolute inset-0 bg-gradient-to-r from-[#1B42CB] to-[#FF2F6C] animate-gradient"></div>
+              )}
+              <BarChart3
+                className={`w-5 h-5 relative z-10 ${activeTab === "analytics" ? "animate-pulse" : ""}`}
+              />
+              <span className="relative z-10">Analytics</span>
+            </button>
           </div>
         </div>
 
@@ -1274,6 +1293,11 @@ export default function AdminPanel() {
               </div>
             )}
           </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === "analytics" && (
+          <AnalyticsPanel />
         )}
       </div>
 

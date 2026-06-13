@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import * as L from "leaflet";
 import { useRouteNavigation } from "../hooks/useRouteNavigation";
 import { Navigation, Loader2, X } from "lucide-react";
 import { getUserLocation } from "../utils/geolocation";
 
 // Fix for default icons
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
@@ -70,7 +71,7 @@ interface FitBoundsProps {
   coords: [number, number][];
 }
 
-const FitBounds: React.FC<FitBoundsProps> = ({ coords }) => {
+const FitBounds: React.FC<FitBoundsProps> = ({ coords }: FitBoundsProps) => {
   const map = useMap();
   useEffect(() => {
     if (coords && coords.length > 1) {
@@ -83,7 +84,7 @@ const FitBounds: React.FC<FitBoundsProps> = ({ coords }) => {
 const MapComponent: React.FC<MapComponentProps> = ({
   parkingSlots,
   loading = false,
-}) => {
+}: MapComponentProps) => {
   // Default center (Delhi)
   const defaultCenter: [number, number] = [28.6139, 77.209];
 
@@ -151,7 +152,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   // Filter out slots with invalid coordinates
   const validParkingSlots = parkingSlots.filter(
-    (slot) => 
+    (slot: ParkingSlot) => 
       slot.coordinates && 
       typeof slot.coordinates.lat === 'number' && 
       typeof slot.coordinates.lng === 'number' &&
@@ -219,7 +220,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 </Marker>
 
                 {/* Parking slots markers */}
-                {validParkingSlots.map((slot) => {
+                {validParkingSlots.map((slot: ParkingSlot) => {
                   const status = slot.status || "unknown";
                   const statusFormatted = status.charAt(0).toUpperCase() + status.slice(1);
                   
@@ -315,10 +316,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 {routeCoords.length > 0 && (
                   <>
                     <Polyline
-                      positions={routeCoords}
-                      pathOptions={{ color: "#1B42CB", weight: 5 }}
-                      color="#1B42CB"
-                      weight={5}
+                      {...{
+                        positions: routeCoords,
+                        pathOptions: { color: "#1B42CB", weight: 5 },
+                        color: "#1B42CB",
+                        weight: 5
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      } as any}
                     />
                     <FitBounds coords={routeCoords} />
                   </>

@@ -10,6 +10,7 @@ import parkingLogRoute from "./routes/parkingLogRoute.js";
 import dashboardRoute from "./routes/dashboardRoute.js";
 import predictionRoute from "./routes/predictionRoute.js";
 import favoritesRoute from "./routes/favoritesRoute.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
 import cors from "cors";
 import dotenv from "dotenv";
 
@@ -56,6 +57,8 @@ app.use("/api/bookings", bookingRouter);
 app.use("/api/admin/slots", adminSlotsRouter);
 // use user management route.
 app.use("/api/admin/users", userManage);
+// use admin analytics routes.
+app.use("/api/admin/analytics", analyticsRoutes);
 // use parkingLog --- entry exit of vehicle
 app.use("/api", parkingLogRoute);
 // use favorites route
