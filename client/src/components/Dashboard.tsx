@@ -91,6 +91,45 @@ interface ActiveBooking {
   };
 }
 
+const THEME_CLASSES = {
+  light: {
+    bg: "bg-gray-50",
+    text: "text-gray-900",
+    textSecondary: "text-gray-600",
+    textMuted: "text-gray-500",
+    border: "border-gray-200",
+    cardBg: "bg-white",
+    cardBgSecondary: "bg-gray-50",
+    cardBorder: "border-gray-200",
+    overlay: "bg-black/5",
+    chartGrid: "rgba(0, 0, 0, 0.1)",
+    chartText: "#4B5563",
+    gradient: {
+      primary: "from-blue-600 to-blue-500",
+      secondary: "from-pink-600 to-pink-500",
+      accent: "from-blue-600 to-pink-600",
+    },
+  },
+  dark: {
+    bg: "bg-[#191919]",
+    text: "text-[#EEECF6]",
+    textSecondary: "text-[#EEECF6]/70",
+    textMuted: "text-[#EEECF6]/40",
+    border: "border-[#1B42CB]/20",
+    cardBg: "bg-[#191919]/60",
+    cardBgSecondary: "bg-[#191919]/80",
+    cardBorder: "border-[#1B42CB]/20",
+    overlay: "bg-black/40",
+    chartGrid: "rgba(238, 236, 246, 0.1)",
+    chartText: "#EEECF6",
+    gradient: {
+      primary: "from-[#1B42CB] to-[#1B42CB]/80",
+      secondary: "from-[#FF2F6C] to-[#FF2F6C]/80",
+      accent: "from-[#1B42CB] to-[#FF2F6C]",
+    },
+  },
+} as const;
+
 const DashboardPage: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activeBooking, setActiveBooking] = useState<ActiveBooking[]>([]);
@@ -289,47 +328,8 @@ const DashboardPage: React.FC = () => {
   };
 
   // Theme-based classes
-  const getThemeClasses = () => {
-    return theme === "light"
-      ? {
-          bg: "bg-gray-50",
-          text: "text-gray-900",
-          textSecondary: "text-gray-600",
-          textMuted: "text-gray-500",
-          border: "border-gray-200",
-          cardBg: "bg-white",
-          cardBgSecondary: "bg-gray-50",
-          cardBorder: "border-gray-200",
-          overlay: "bg-black/5",
-          chartGrid: "rgba(0, 0, 0, 0.1)",
-          chartText: "#4B5563",
-          gradient: {
-            primary: "from-blue-600 to-blue-500",
-            secondary: "from-pink-600 to-pink-500",
-            accent: "from-blue-600 to-pink-600",
-          },
-        }
-      : {
-          bg: "bg-[#191919]",
-          text: "text-[#EEECF6]",
-          textSecondary: "text-[#EEECF6]/70",
-          textMuted: "text-[#EEECF6]/40",
-          border: "border-[#1B42CB]/20",
-          cardBg: "bg-[#191919]/60",
-          cardBgSecondary: "bg-[#191919]/80",
-          cardBorder: "border-[#1B42CB]/20",
-          overlay: "bg-black/40",
-          chartGrid: "rgba(238, 236, 246, 0.1)",
-          chartText: "#EEECF6",
-          gradient: {
-            primary: "from-[#1B42CB] to-[#1B42CB]/80",
-            secondary: "from-[#FF2F6C] to-[#FF2F6C]/80",
-            accent: "from-[#1B42CB] to-[#FF2F6C]",
-          },
-        };
-  };
-
-  const themeClasses = getThemeClasses();
+  const themeClasses =
+    THEME_CLASSES[theme as keyof typeof THEME_CLASSES] || THEME_CLASSES.light;
 
   // Chart configurations with theme support
   const chartOptions = {

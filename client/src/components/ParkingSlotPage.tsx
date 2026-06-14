@@ -17,6 +17,7 @@ import "leaflet/dist/leaflet.css";
 import * as L from "leaflet";
 import { useRouteNavigation } from "../hooks/useRouteNavigation";
 import { getUserLocation } from "../utils/geolocation";
+import { THEME_CONFIG } from "../config/ThemeConfig";
 
 // Fix for default Leaflet icons
 delete (L.Icon.Default.prototype as L.Icon.Default & { _getIconUrl?: unknown })._getIconUrl;
@@ -291,59 +292,9 @@ const ParkingSlotPage: React.FC = () => {
   // Detect system theme
   const { theme } = useTheme();
 
-  // Theme-based classes
-  const getThemeClasses = () => {
-    return theme === "light"
-      ? {
-          bg: "bg-gray-50",
-          text: "text-gray-900",
-          textSecondary: "text-gray-600",
-          textMuted: "text-gray-500",
-          border: "border-gray-200",
-          cardBg: "bg-white",
-          cardBgSecondary: "bg-gray-100",
-          cardBorder: "border-gray-200",
-          overlay: "bg-black/5",
-          hover: "hover:bg-gray-100",
-          gradient: {
-            primary: "from-blue-600 to-blue-500",
-            secondary: "from-pink-600 to-pink-500",
-            accent: "from-blue-600 to-pink-600",
-          },
-          status: {
-            available: "bg-green-100 text-green-700 border-green-200",
-            occupied: "bg-red-100 text-red-700 border-red-200",
-            maintenance: "bg-yellow-100 text-yellow-700 border-yellow-200",
-            default: "bg-gray-100 text-gray-700 border-gray-200",
-          },
-        }
-      : {
-          bg: "bg-[#191919]",
-          text: "text-[#EEECF6]",
-          textSecondary: "text-[#EEECF6]/70",
-          textMuted: "text-[#EEECF6]/50",
-          border: "border-[#1B42CB]/20",
-          cardBg: "bg-[#191919]/60",
-          cardBgSecondary: "bg-[#191919]/80",
-          cardBorder: "border-[#1B42CB]/20",
-          overlay: "bg-black/40",
-          hover: "hover:bg-[#1B42CB]/10",
-          gradient: {
-            primary: "from-[#1B42CB] to-[#1B42CB]/80",
-            secondary: "from-[#FF2F6C] to-[#FF2F6C]/80",
-            accent: "from-[#1B42CB] to-[#FF2F6C]",
-          },
-          status: {
-            available: "bg-green-500/20 text-green-300 border-green-500/30",
-            occupied: "bg-red-500/20 text-red-300 border-red-500/30",
-            maintenance:
-              "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-            default: "bg-gray-500/20 text-gray-300 border-gray-500/30",
-          },
-        };
-  };
-
-  const themeClasses = getThemeClasses();
+  // Use the pre-computed static map to prevent unnecessary re-allocations during render
+  const themeClasses =
+    THEME_CONFIG[theme as keyof typeof THEME_CONFIG] || THEME_CONFIG.light;
 
   /**
    * Fetches parking slots from GET /api/admin/slots.
@@ -428,45 +379,45 @@ const ParkingSlotPage: React.FC = () => {
   }, [token]);
 
   // Handle Toggle Favorite Button Click
-  const handleToggleFavorite = async (
-    e: React.MouseEvent,
-    locationId: string,
-  ) => {
-    e.stopPropagation(); // Prevents map markers from triggering if nested
-
-    if (!token || !user) {
-      alert("Please login to save favorite locations");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      // Optimistically update UI
-      setFavorites((prev) =>
-        prev.includes(locationId)
-          ? prev.filter((id) => id !== locationId)
-          : [...prev, locationId],
-      );
-
-      const res = await fetch(`/api/favorites/${locationId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await res.json();
-      if (!data.success) {
-        // Revert on failure
-        fetchFavorites();
-        console.error("Failed to toggle favorite:", data.message);
-      }
-    } catch (err) {
-      console.error("Error toggling favorite:", err);
-      fetchFavorites(); // Revert on failure
-    }
-  };
+  // const handleToggleFavorite = async (
+  //   e: React.MouseEvent,
+  //   locationId: string,
+  // ) => {
+  //   e.stopPropagation(); // Prevents map markers from triggering if nested
+  //
+  //   if (!token || !user) {
+  //     alert("Please login to save favorite locations");
+  //     navigate("/login");
+  //     return;
+  //   }
+  //
+  //   try {
+  //     // Optimistically update UI
+  //     setFavorites((prev) =>
+  //       prev.includes(locationId)
+  //         ? prev.filter((id) => id !== locationId)
+  //         : [...prev, locationId],
+  //     );
+  //
+  //     const res = await fetch(`/api/favorites/${locationId}`, {
+  //       method: "POST",
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //     });
+  //
+  //     const data = await res.json();
+  //     if (!data.success) {
+  //       // Revert on failure
+  //       fetchFavorites();
+  //       console.error("Failed to toggle favorite:", data.message);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error toggling favorite:", err);
+  //     fetchFavorites(); // Revert on failure
+  //   }
+  // };
 
   // Calculate distance between two coordinates
   const calculateDistance = (
@@ -1994,6 +1945,6 @@ const ParkingSlotPage: React.FC = () => {
       </div>
     </>
   );
-};
+};;
 
 export default ParkingSlotPage;

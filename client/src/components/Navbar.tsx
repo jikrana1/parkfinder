@@ -4,6 +4,44 @@ import { useAuth } from "../context/AuthContext";
 import * as Icons from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 
+const THEME_CLASSES = {
+  light: {
+    bg: "bg-[#f8fafc]",
+    navBgScrolled: "bg-white/90 backdrop-blur-xl border-b border-gray-200",
+    navBgUnscrolled: "bg-white/70 backdrop-blur-lg",
+    text: "text-gray-900",
+    textSecondary: "text-gray-600",
+    border: "border-gray-200",
+    card: "bg-white/80 border-gray-200",
+    hover: "hover:bg-gray-100",
+    gradient: "from-blue-600 via-indigo-500 to-pink-500",
+    active:
+      "bg-gradient-to-r from-blue-500/10 to-pink-500/10 border border-blue-200",
+  },
+  dark: {
+    bg: "bg-[#0a0a0a]",
+    navBgScrolled: `
+      bg-[#141414]
+      backdrop-blur-xl
+      border-b border-white/10
+      shadow-[0_8px_30px_rgba(0,0,0,0.45)]
+    `,
+    navBgUnscrolled: `
+      bg-[#141414]
+      backdrop-blur-xl
+      border-b border-white/5
+    `,
+    text: "text-white",
+    textSecondary: "text-white/70",
+    border: "border-white/10",
+    card: "bg-white/5 border-white/10",
+    hover: "hover:bg-white/10",
+    gradient: "from-[#1B42CB] via-[#5B7CFF] to-[#FF2F6C]",
+    active:
+      "bg-gradient-to-r from-[#1B42CB]/20 to-[#FF2F6C]/20 border border-[#1B42CB]/20",
+  },
+} as const;
+
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,60 +72,9 @@ const Navbar: React.FC = () => {
   // THEME CLASSES
   // =========================
 
-  const getThemeClasses = () => {
-    return theme === "light"
-      ? {
-          bg: "bg-[#f8fafc]",
-          navBg: isScrolled
-            ? "bg-white/90 backdrop-blur-xl border-b border-gray-200"
-            : "bg-white/70 backdrop-blur-lg",
-
-          text: "text-gray-900",
-          textSecondary: "text-gray-600",
-
-          border: "border-gray-200",
-
-          card: "bg-white/80 border-gray-200",
-
-          hover: "hover:bg-gray-100",
-
-          gradient: "from-blue-600 via-indigo-500 to-pink-500",
-
-          active:
-            "bg-gradient-to-r from-blue-500/10 to-pink-500/10 border border-blue-200",
-        }
-      : {
-          bg: "bg-[#0a0a0a]",
-          navBg: isScrolled
-            ? `
-    bg-[#141414]
-    backdrop-blur-xl
-    border-b border-white/10
-    shadow-[0_8px_30px_rgba(0,0,0,0.45)]
-  `
-            : `
-    bg-[#141414]
-    backdrop-blur-xl
-    border-b border-white/5
-  `,
-          text: "text-white",
-
-          textSecondary: "text-white/70",
-
-          border: "border-white/10",
-
-          card: "bg-white/5 border-white/10",
-
-          hover: "hover:bg-white/10",
-
-          gradient: "from-[#1B42CB] via-[#5B7CFF] to-[#FF2F6C]",
-
-          active:
-            "bg-gradient-to-r from-[#1B42CB]/20 to-[#FF2F6C]/20 border border-[#1B42CB]/20",
-        };
-  };
-
-  const themeClasses = getThemeClasses();
+  const themeClasses =
+    THEME_CLASSES[theme as keyof typeof THEME_CLASSES] || THEME_CLASSES.light;
+  const navBg = isScrolled ? themeClasses.navBgScrolled : themeClasses.navBgUnscrolled;
 
   // =========================
   // NAVIGATION ITEMS
@@ -152,7 +139,7 @@ const Navbar: React.FC = () => {
         className={`
           fixed top-0 left-0 right-0 z-50
           transition-all duration-500
-          ${themeClasses.navBg}
+          ${navBg}
         `}
       >
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-10">

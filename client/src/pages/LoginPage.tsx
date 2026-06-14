@@ -4,6 +4,51 @@ import { useNavigate, Link } from "react-router-dom";
 import { useTheme } from "../context/ThemeContext";
 import { Eye, EyeOff, Mail, Lock, Car, AlertCircle, LogIn } from "lucide-react";
 
+const THEME_CLASSES = {
+  light: {
+    bg: "bg-gray-50",
+    cardBg: "bg-white/90",
+    text: "text-gray-900",
+    textSecondary: "text-gray-600",
+    textMuted: "text-gray-500",
+    border: "border-gray-200",
+    borderAccent: "border-blue-600/30",
+    inputBg: "bg-white",
+    inputBorder: "border-gray-300",
+    placeholder: "placeholder-gray-400",
+    iconColor: "text-blue-600",
+    iconSecondary: "text-pink-600",
+    buttonGradient: "from-blue-600 to-pink-600",
+    hoverBg: "hover:bg-blue-600/10",
+    shadow: "shadow-blue-600/10",
+    overlay: "bg-black/5",
+    errorBg: "bg-red-50",
+    errorBorder: "border-red-300",
+    errorText: "text-red-600",
+  },
+  dark: {
+    bg: "bg-[#191919]",
+    cardBg: "bg-[#191919]/70",
+    text: "text-[#EEECF6]",
+    textSecondary: "text-[#EEECF6]/70",
+    textMuted: "text-[#EEECF6]/40",
+    border: "border-[#1B42CB]/30",
+    borderAccent: "border-[#1B42CB]/30",
+    inputBg: "bg-[#191919]/50",
+    inputBorder: "border-[#1B42CB]/30",
+    placeholder: "placeholder-[#EEECF6]/40",
+    iconColor: "text-[#1B42CB]",
+    iconSecondary: "text-[#FF2F6C]",
+    buttonGradient: "from-[#1B42CB] to-[#FF2F6C]",
+    hoverBg: "hover:bg-[#1B42CB]/10",
+    shadow: "shadow-[#1B42CB]/10",
+    overlay: "bg-black/40",
+    errorBg: "bg-red-500/10",
+    errorBorder: "border-red-500/30",
+    errorText: "text-red-400",
+  },
+} as const;
+
 export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -18,53 +63,8 @@ export default function LoginPage() {
   const { theme } = useTheme();
 
   // Theme-based classes
-  const getThemeClasses = () => {
-    return theme === "light"
-      ? {
-          bg: "bg-gray-50",
-          cardBg: "bg-white/90",
-          text: "text-gray-900",
-          textSecondary: "text-gray-600",
-          textMuted: "text-gray-500",
-          border: "border-gray-200",
-          borderAccent: "border-blue-600/30",
-          inputBg: "bg-white",
-          inputBorder: "border-gray-300",
-          placeholder: "placeholder-gray-400",
-          iconColor: "text-blue-600",
-          iconSecondary: "text-pink-600",
-          buttonGradient: "from-blue-600 to-pink-600",
-          hoverBg: "hover:bg-blue-600/10",
-          shadow: "shadow-blue-600/10",
-          overlay: "bg-black/5",
-          errorBg: "bg-red-50",
-          errorBorder: "border-red-300",
-          errorText: "text-red-600",
-        }
-      : {
-          bg: "bg-[#191919]",
-          cardBg: "bg-[#191919]/70",
-          text: "text-[#EEECF6]",
-          textSecondary: "text-[#EEECF6]/70",
-          textMuted: "text-[#EEECF6]/40",
-          border: "border-[#1B42CB]/30",
-          borderAccent: "border-[#1B42CB]/30",
-          inputBg: "bg-[#191919]/50",
-          inputBorder: "border-[#1B42CB]/30",
-          placeholder: "placeholder-[#EEECF6]/40",
-          iconColor: "text-[#1B42CB]",
-          iconSecondary: "text-[#FF2F6C]",
-          buttonGradient: "from-[#1B42CB] to-[#FF2F6C]",
-          hoverBg: "hover:bg-[#1B42CB]/10",
-          shadow: "shadow-[#1B42CB]/10",
-          overlay: "bg-black/40",
-          errorBg: "bg-red-500/10",
-          errorBorder: "border-red-500/30",
-          errorText: "text-red-400",
-        };
-  };
-
-  const themeClasses = getThemeClasses();
+  const themeClasses =
+    THEME_CLASSES[theme as keyof typeof THEME_CLASSES] || THEME_CLASSES.light;
 
   const validateForm = () => {
     const newErrors = { email: "", password: "" };

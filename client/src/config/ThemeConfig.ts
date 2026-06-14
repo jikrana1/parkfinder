@@ -1,0 +1,48 @@
+export const THEME_CONFIG = {
+  light: {
+    bg: "bg-gray-50",
+    text: "text-gray-900",
+    textSecondary: "text-gray-600",
+    textMuted: "text-gray-500",
+    border: "border-gray-200",
+    cardBg: "bg-white",
+    cardBgSecondary: "bg-gray-100",
+    cardBorder: "border-gray-200",
+    overlay: "bg-black/5",
+    hover: "hover:bg-gray-100",
+    gradient: {
+      primary: "from-blue-600 to-blue-500",
+      secondary: "from-pink-600 to-pink-500",
+      accent: "from-blue-600 to-pink-600",
+    },
+    status: {
+      available: "bg-green-100 text-green-700 border-green-200",
+      occupied: "bg-red-100 text-red-700 border-red-200",
+      maintenance: "bg-yellow-100 text-yellow-700 border-yellow-200",
+      default: "bg-gray-100 text-gray-700 border-gray-200",
+    },
+  },
+  dark: {
+    bg: "bg-[#191919]",
+    text: "text-[#EEECF6]",
+    textSecondary: "text-[#EEECF6]/70",
+    textMuted: "text-[#EEECF6]/50",
+    border: "border-[#1B42CB]/20",
+    cardBg: "bg-[#191919]/60",
+    cardBgSecondary: "bg-[#191919]/80",
+    cardBorder: "border-[#1B42CB]/20",
+    overlay: "bg-black/40",
+    hover: "hover:bg-[#1B42CB]/10",
+    gradient: {
+      primary: "from-[#1B42CB] to-[#1B42CB]/80",
+      secondary: "from-[#FF2F6C] to-[#FF2F6C]/80",
+      accent: "from-[#1B42CB] to-[#FF2F6C]",
+    },
+    status: {
+      available: "bg-green-500/20 text-green-300 border-green-500/30",
+      occupied: "bg-red-500/20 text-red-300 border-red-500/30",
+      maintenance: "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+      default: "bg-gray-500/20 text-gray-300 border-gray-500/30",
+    },
+  },
+} as const;

@@ -16,6 +16,97 @@ import {
   UserPlus,
 } from "lucide-react";
 
+const THEME_CLASSES = {
+  light: {
+    bg: "bg-gray-50",
+    cardBg: "bg-white/90",
+    text: "text-gray-900",
+    textSecondary: "text-gray-600",
+    textMuted: "text-gray-500",
+    border: "border-gray-200",
+    borderAccent: "border-blue-600/30",
+    inputBg: "bg-white",
+    inputBorder: "border-gray-300",
+    placeholder: "placeholder-gray-400",
+    iconColor: "text-blue-600",
+    iconSecondary: "text-pink-600",
+    buttonGradient: {
+      primary: "from-blue-600 to-pink-600",
+      admin: "from-pink-600 to-red-600",
+    },
+    hoverBg: "hover:bg-blue-600/10",
+    shadow: "shadow-blue-600/10",
+    overlay: "bg-black/5",
+    errorBg: "bg-red-50",
+    errorBorder: "border-red-300",
+    errorText: "text-red-600",
+    successBg: "bg-green-50",
+    successBorder: "border-green-300",
+    successText: "text-green-600",
+    roleCard: {
+      user: {
+        active: "bg-blue-50 border-blue-500 text-blue-900",
+        inactive:
+          "bg-white border-gray-200 text-gray-600 hover:border-blue-400",
+      },
+      admin: {
+        active: "bg-pink-50 border-pink-500 text-pink-900",
+        inactive:
+          "bg-white border-gray-200 text-gray-600 hover:border-pink-400",
+      },
+    },
+    strength: {
+      weak: "text-red-600",
+      good: "text-yellow-600",
+      strong: "text-green-600",
+    },
+  },
+  dark: {
+    bg: "bg-[#191919]",
+    cardBg: "bg-[#191919]/70",
+    text: "text-[#EEECF6]",
+    textSecondary: "text-[#EEECF6]/70",
+    textMuted: "text-[#EEECF6]/40",
+    border: "border-[#1B42CB]/30",
+    borderAccent: "border-[#1B42CB]/30",
+    inputBg: "bg-[#191919]/50",
+    inputBorder: "border-[#1B42CB]/30",
+    placeholder: "placeholder-[#EEECF6]/40",
+    iconColor: "text-[#1B42CB]",
+    iconSecondary: "text-[#FF2F6C]",
+    buttonGradient: {
+      primary: "from-[#1B42CB] to-[#FF2F6C]",
+      admin: "from-[#FF2F6C] to-red-600",
+    },
+    hoverBg: "hover:bg-[#1B42CB]/10",
+    shadow: "shadow-[#1B42CB]/10",
+    overlay: "bg-black/40",
+    errorBg: "bg-red-500/10",
+    errorBorder: "border-red-500/30",
+    errorText: "text-red-400",
+    successBg: "bg-green-500/10",
+    successBorder: "border-green-500/30",
+    successText: "text-green-400",
+    roleCard: {
+      user: {
+        active: "bg-[#1B42CB]/20 border-[#1B42CB] text-[#EEECF6]",
+        inactive:
+          "bg-[#191919]/50 border-[#1B42CB]/30 text-[#EEECF6]/60 hover:border-[#1B42CB]",
+      },
+      admin: {
+        active: "bg-[#FF2F6C]/20 border-[#FF2F6C] text-[#EEECF6]",
+        inactive:
+          "bg-[#191919]/50 border-[#FF2F6C]/30 text-[#EEECF6]/60 hover:border-[#FF2F6C]",
+      },
+    },
+    strength: {
+      weak: "text-red-400",
+      good: "text-yellow-400",
+      strong: "text-green-400",
+    },
+  },
+} as const;
+
 export default function SignupPage() {
   const { login } = useAuth();
   const [form, setForm] = useState({
@@ -48,99 +139,8 @@ export default function SignupPage() {
   const { theme } = useTheme();
 
   // Theme-based classes
-  const getThemeClasses = () => {
-    return theme === "light"
-      ? {
-          bg: "bg-gray-50",
-          cardBg: "bg-white/90",
-          text: "text-gray-900",
-          textSecondary: "text-gray-600",
-          textMuted: "text-gray-500",
-          border: "border-gray-200",
-          borderAccent: "border-blue-600/30",
-          inputBg: "bg-white",
-          inputBorder: "border-gray-300",
-          placeholder: "placeholder-gray-400",
-          iconColor: "text-blue-600",
-          iconSecondary: "text-pink-600",
-          buttonGradient: {
-            primary: "from-blue-600 to-pink-600",
-            admin: "from-pink-600 to-red-600",
-          },
-          hoverBg: "hover:bg-blue-600/10",
-          shadow: "shadow-blue-600/10",
-          overlay: "bg-black/5",
-          errorBg: "bg-red-50",
-          errorBorder: "border-red-300",
-          errorText: "text-red-600",
-          successBg: "bg-green-50",
-          successBorder: "border-green-300",
-          successText: "text-green-600",
-          roleCard: {
-            user: {
-              active: "bg-blue-50 border-blue-500 text-blue-900",
-              inactive:
-                "bg-white border-gray-200 text-gray-600 hover:border-blue-400",
-            },
-            admin: {
-              active: "bg-pink-50 border-pink-500 text-pink-900",
-              inactive:
-                "bg-white border-gray-200 text-gray-600 hover:border-pink-400",
-            },
-          },
-          strength: {
-            weak: "text-red-600",
-            good: "text-yellow-600",
-            strong: "text-green-600",
-          },
-        }
-      : {
-          bg: "bg-[#191919]",
-          cardBg: "bg-[#191919]/70",
-          text: "text-[#EEECF6]",
-          textSecondary: "text-[#EEECF6]/70",
-          textMuted: "text-[#EEECF6]/40",
-          border: "border-[#1B42CB]/30",
-          borderAccent: "border-[#1B42CB]/30",
-          inputBg: "bg-[#191919]/50",
-          inputBorder: "border-[#1B42CB]/30",
-          placeholder: "placeholder-[#EEECF6]/40",
-          iconColor: "text-[#1B42CB]",
-          iconSecondary: "text-[#FF2F6C]",
-          buttonGradient: {
-            primary: "from-[#1B42CB] to-[#FF2F6C]",
-            admin: "from-[#FF2F6C] to-red-600",
-          },
-          hoverBg: "hover:bg-[#1B42CB]/10",
-          shadow: "shadow-[#1B42CB]/10",
-          overlay: "bg-black/40",
-          errorBg: "bg-red-500/10",
-          errorBorder: "border-red-500/30",
-          errorText: "text-red-400",
-          successBg: "bg-green-500/10",
-          successBorder: "border-green-500/30",
-          successText: "text-green-400",
-          roleCard: {
-            user: {
-              active: "bg-[#1B42CB]/20 border-[#1B42CB] text-[#EEECF6]",
-              inactive:
-                "bg-[#191919]/50 border-[#1B42CB]/30 text-[#EEECF6]/60 hover:border-[#1B42CB]",
-            },
-            admin: {
-              active: "bg-[#FF2F6C]/20 border-[#FF2F6C] text-[#EEECF6]",
-              inactive:
-                "bg-[#191919]/50 border-[#FF2F6C]/30 text-[#EEECF6]/60 hover:border-[#FF2F6C]",
-            },
-          },
-          strength: {
-            weak: "text-red-400",
-            good: "text-yellow-400",
-            strong: "text-green-400",
-          },
-        };
-  };
-
-  const themeClasses = getThemeClasses();
+  const themeClasses =
+    THEME_CLASSES[theme as keyof typeof THEME_CLASSES] || THEME_CLASSES.light;
 
   const validateForm = () => {
     const newErrors = {

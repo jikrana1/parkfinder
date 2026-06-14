@@ -26,6 +26,37 @@ interface Booking {
   bookingStatus?: "active" | "cancelled" | "completed";
 }
 
+const THEME_CLASSES = {
+  light: {
+    bg: "bg-gray-50",
+    text: "text-gray-900",
+    textSecondary: "text-gray-600",
+    border: "border-gray-200",
+    cardBg: "bg-white",
+    cardBorder: "border-gray-200",
+    overlay: "bg-black/5",
+    gradient: {
+      primary: "from-blue-600 to-blue-500",
+      secondary: "from-pink-600 to-pink-500",
+      accent: "from-blue-600 to-pink-600",
+    },
+  },
+  dark: {
+    bg: "bg-[#191919]",
+    text: "text-[#EEECF6]",
+    textSecondary: "text-[#EEECF6]/70",
+    border: "border-[#1B42CB]/20",
+    cardBg: "bg-[#191919]/40",
+    cardBorder: "border-[#1B42CB]/20",
+    overlay: "bg-black/40",
+    gradient: {
+      primary: "from-[#1B42CB] to-[#1B42CB]/80",
+      secondary: "from-[#FF2F6C] to-[#FF2F6C]/80",
+      accent: "from-[#1B42CB] to-[#FF2F6C]",
+    },
+  },
+} as const;
+
 const BookedSlotsPage: React.FC = () => {
   const [bookedSlots, setBookedSlots] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -270,39 +301,8 @@ const BookedSlotsPage: React.FC = () => {
   };
 
   // Theme-based classes
-  const getThemeClasses = () => {
-    return theme === "light"
-      ? {
-          bg: "bg-gray-50",
-          text: "text-gray-900",
-          textSecondary: "text-gray-600",
-          border: "border-gray-200",
-          cardBg: "bg-white",
-          cardBorder: "border-gray-200",
-          overlay: "bg-black/5",
-          gradient: {
-            primary: "from-blue-600 to-blue-500",
-            secondary: "from-pink-600 to-pink-500",
-            accent: "from-blue-600 to-pink-600",
-          },
-        }
-      : {
-          bg: "bg-[#191919]",
-          text: "text-[#EEECF6]",
-          textSecondary: "text-[#EEECF6]/70",
-          border: "border-[#1B42CB]/20",
-          cardBg: "bg-[#191919]/40",
-          cardBorder: "border-[#1B42CB]/20",
-          overlay: "bg-black/40",
-          gradient: {
-            primary: "from-[#1B42CB] to-[#1B42CB]/80",
-            secondary: "from-[#FF2F6C] to-[#FF2F6C]/80",
-            accent: "from-[#1B42CB] to-[#FF2F6C]",
-          },
-        };
-  };
-
-  const themeClasses = getThemeClasses();
+  const themeClasses =
+    THEME_CLASSES[theme as keyof typeof THEME_CLASSES] || THEME_CLASSES.light;
 
   const getStatusColor = (status: string): string => {
     switch (status?.toLowerCase()) {
