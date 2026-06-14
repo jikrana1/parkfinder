@@ -10,11 +10,13 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AdminPanel from "./components/AdminPanel";
 import DashboardPage from "./components/Dashboard";
+import BackToTop from "./components/BackToTop";
 
 function App() {
   return (
     <Router>
       <Navbar />
+      <BackToTop />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/dashboard" element={<DashboardPage />} />

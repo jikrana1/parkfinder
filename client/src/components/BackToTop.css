@@ -1,4 +1,4 @@
-/* Premium Futuristic Back to Top Styles */
+/* Scroll-to-Top — theme-aware floating button */
 
 .back-to-top {
   position: fixed;
@@ -7,30 +7,43 @@
   width: 3.6rem;
   height: 3.6rem;
   border-radius: 50%;
-  background: rgba(25, 25, 25, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: #eeecf6;
-  border: 1.5px solid rgba(27, 66, 203, 0.4);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   z-index: 999;
   outline: none;
-  overflow: visible; /* Needed for glow ring to expand beyond boundaries */
-  
-  /* Initial hidden state for premium transition */
+  overflow: visible;
+
+  /* Light mode defaults */
+  background: rgba(255, 255, 255, 0.88);
+  color: #1b42cb;
+  border: 1.5px solid rgba(27, 66, 203, 0.25);
+  box-shadow:
+    0 4px 16px rgba(27, 66, 203, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+
+  /* Initial hidden state */
   opacity: 0;
   visibility: hidden;
   transform: translateY(30px) scale(0.85);
-  transition: 
-    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
-    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), 
-    border-color 0.3s ease, 
+  transition:
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease,
     box-shadow 0.3s ease,
-    color 0.3s ease;
+    color 0.3s ease,
+    background 0.3s ease;
+}
+
+/* Dark mode overrides */
+.dark .back-to-top {
+  background: rgba(25, 25, 25, 0.75);
+  color: #eeecf6;
+  border-color: rgba(27, 66, 203, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Visible state */
@@ -57,9 +70,17 @@
 /* Hover state styling */
 .back-to-top:hover {
   transform: translateY(-6px) scale(1.1);
+  border-color: rgba(255, 47, 108, 0.6);
+  box-shadow:
+    0 10px 24px rgba(255, 47, 108, 0.2),
+    0 4px 12px rgba(27, 66, 203, 0.15);
+  color: #ff2f6c;
+}
+
+.dark .back-to-top:hover {
   border-color: rgba(255, 47, 108, 0.8);
-  box-shadow: 
-    0 12px 30px rgba(255, 47, 108, 0.35), 
+  box-shadow:
+    0 12px 30px rgba(255, 47, 108, 0.35),
     0 0 20px rgba(27, 66, 203, 0.35);
   color: #ffffff;
 }
@@ -94,8 +115,14 @@
 /* Active click state: button compresses slightly */
 .back-to-top:active {
   transform: translateY(-2px) scale(0.92);
-  box-shadow: 
-    0 6px 15px rgba(255, 47, 108, 0.25), 
+  box-shadow:
+    0 4px 12px rgba(255, 47, 108, 0.18),
+    0 0 8px rgba(27, 66, 203, 0.12);
+}
+
+.dark .back-to-top:active {
+  box-shadow:
+    0 6px 15px rgba(255, 47, 108, 0.25),
     0 0 12px rgba(27, 66, 203, 0.25);
 }
 
@@ -112,7 +139,7 @@
   transform: rotate(180deg);
 }
 
-/* Arrow SVG vector styling */
+/* Arrow icon styling */
 .back-to-top svg {
   width: 1.5rem;
   height: 1.5rem;
@@ -127,8 +154,22 @@
   transform: translateY(-3px);
 }
 
-/* Post-Scroll Pulse Animation */
-@keyframes top-glow-pulse {
+/* Post-scroll pulse animation */
+@keyframes top-glow-pulse-light {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 47, 108, 0.5), 0 0 0 0 rgba(27, 66, 203, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(255, 47, 108, 0), 0 0 0 12px rgba(27, 66, 203, 0);
+  }
+  100% {
+    box-shadow:
+      0 4px 16px rgba(27, 66, 203, 0.12),
+      0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+}
+
+@keyframes top-glow-pulse-dark {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 47, 108, 0.8), 0 0 0 0 rgba(27, 66, 203, 0.5);
   }
@@ -141,7 +182,11 @@
 }
 
 .back-to-top.pulse {
-  animation: top-glow-pulse 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: top-glow-pulse-light 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.dark .back-to-top.pulse {
+  animation: top-glow-pulse-dark 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Responsive Scaling */
