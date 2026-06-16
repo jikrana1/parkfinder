@@ -29,32 +29,32 @@ const parkingSchema = new mongoose.Schema(
       enum: ["Type 1", "Type 2", "CCS", "CHAdeMO", "None"],
       default: "None",
     },
-  },
-  floors: [
-    {
-      floorNumber: { type: Number, required: true },
-      floorName: { type: String, default: "" },
-      totalSlots: { type: Number, default: 0 },
-      availableSlots: { type: Number, default: 0 },
-      isCovered: { type: Boolean, default: false },
-      slotRows: [
-        {
-          row: { type: String },
-          slots: [
-            {
-              slotId: { type: String },
-              isOccupied: { type: Boolean, default: false },
-              isReserved: { type: Boolean, default: false },
-              vehicleType: {
-                type: String,
-                enum: ["car", "bike", "ev", "disabled", "any"],
-                default: "any",
+    floors: [
+      {
+        floorNumber: { type: Number, required: true },
+        floorName: { type: String, default: "" },
+        totalSlots: { type: Number, default: 0 },
+        availableSlots: { type: Number, default: 0 },
+        isCovered: { type: Boolean, default: false },
+        slotRows: [
+          {
+            row: { type: String },
+            slots: [
+              {
+                slotId: { type: String },
+                isOccupied: { type: Boolean, default: false },
+                isReserved: { type: Boolean, default: false },
+                vehicleType: {
+                  type: String,
+                  enum: ["car", "bike", "ev", "disabled", "any"],
+                  default: "any",
+                },
               },
-            },
-          ],
-        },
-      ],
-    },
-  ],
-});
+            ],
+          },
+        ],
+      },
+    ],
+  }
+);
 export default mongoose.model("Parking", parkingSchema);
