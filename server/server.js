@@ -19,7 +19,9 @@ import { connectRedis } from "./utils/cache.js";
 dotenv.config({ path: ".env" });
 
 // Connect to Redis
-connectRedis();
+if (process.env.NODE_ENV !== 'test') {
+  connectRedis();
+}
 
 // Validate critical environment variables at startup
 const requiredEnvVars = ["JWT_SECRET", "ADMIN_SECRET"];
@@ -49,7 +51,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to Database
-connectDB();
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 // use auth route.
 app.use("/api/auth", authRoutes);
 // get/Use Booking APi data
@@ -92,6 +96,10 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
