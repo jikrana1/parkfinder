@@ -27,6 +27,7 @@ export interface ParkingSlot {
     managerName?: string;
   };
   images?: string[];
+  description?: string;
 }
 
 export interface ApiResponse {
@@ -105,7 +106,7 @@ export const useParkingSlots = () => {
   }, [evFilter, fetchParkingSlots]);
 
   const refetch = useCallback(() => {
-    fetchParkingSlots(evFilter);
+    return fetchParkingSlots(evFilter);
   }, [evFilter, fetchParkingSlots]);
 
   return {

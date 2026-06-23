@@ -17,6 +17,7 @@ import FilterBar from "./FilterBar";
 import ParkingCard from "./ParkingCard";
 import MapView from "./MapView";
 import BookingModal from "./BookingModal";
+import PullToRefresh from "./PullToRefresh";
 
 const ParkingSlotPage: React.FC = () => {
   const navigate = useNavigate();
@@ -165,8 +166,9 @@ const ParkingSlotPage: React.FC = () => {
 
   return (
     <>
-      <div className={`min-h-screen ${themeClasses.bg} transition-colors duration-300 p-4 md:p-6`}>
-        {/* Animated Background Elements */}
+      <PullToRefresh onRefresh={async () => { await refetch(); }}>
+        <div className={`min-h-screen ${themeClasses.bg} transition-colors duration-300 p-4 md:p-6`}>
+          {/* Animated Background Elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#1B42CB]/10 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#FF2F6C]/10 rounded-full blur-3xl"></div>
@@ -362,6 +364,7 @@ const ParkingSlotPage: React.FC = () => {
           )}
         </div>
       </div>
+      </PullToRefresh>
 
       {/* Prediction Panel Modal */}
       {predictionSlot && (
