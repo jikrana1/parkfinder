@@ -21,6 +21,7 @@ import FavoritesPage from "./pages/FavoritesPage";
 import ContactPage from "./pages/ContactPage";
 import SessionTimeout from "./components/SessionTimeout";
 import CookieConsent from "./components/CookieConsent";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Router>
   );
