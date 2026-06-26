@@ -1,7 +1,7 @@
 import express from "express";
 
 import { authMiddleware } from "../middleware/auth.js";
-import { cancelBooking, createBooking, deleteBooking, getAllBookings, getMyBookings, updateBookingStatus } from "../controllers/booking.controller.js";
+import { cancelBooking, createBooking, deleteBooking, getAllBookings, getMyBookings, updateBookingStatus, extendBooking } from "../controllers/booking.controller.js";
 import { validateRequest } from "../middleware/validate.js";
 import { createBookingSchema, updateBookingStatusSchema, cancelBookingSchema } from "../validators/booking.validator.js";
 
@@ -26,7 +26,10 @@ router.get("/my-bookings", authMiddleware, getMyBookings);
 router.post("/book", authMiddleware, validateRequest(createBookingSchema), createBooking);
 
 // Cancel booking (user)
-router.delete("/cancel/:id", authMiddleware, validateRequest(cancelBookingSchema), cancelBooking);
+router.delete("/cancel/:id", authMiddleware, validateRequest(cancelBookingSchema),  cancelBooking);
+
+// Extend booking duration (user)
+router.patch("/:id/extend", authMiddleware, extendBooking);
 
 // ================== ADMIN BOOKINGS ==================
 /**

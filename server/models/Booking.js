@@ -28,6 +28,23 @@ const bookingSchema = new mongoose.Schema({
     enum: ["active", "cancelled", "completed"],
     default: "active",
   },
+  // Extension tracking
+  originalDuration: {
+    type: Number,
+    default: null,
+  },
+  extensions: [
+    {
+      extendedAt: { type: Date, default: Date.now },
+      additionalHours: { type: Number, required: true },
+      additionalCost: { type: Number, required: true },
+      newExpiry: { type: Date, required: true },
+    },
+  ],
+  expiresAt: {
+    type: Date,
+    default: null,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

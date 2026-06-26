@@ -18,6 +18,9 @@ import dotenv from "dotenv";
 import floorVisualizationRoute from "./routes/floorVisualizationRoute.js";
 import reviewRoute from "./routes/reviewRoute.js";
 import { connectRedis } from "./utils/cache.js";
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import { swaggerOptions } from "./config/swagger.js";
 
 dotenv.config({ path: ".env" });
 
@@ -64,10 +67,18 @@ app.use("/api/auth", authRoutes);
 app.use("/api/auth/2fa", auth2faRoutes);
 // get/Use Booking APi data
 app.use("/api", getbookingdata);
-// get/Use Parking API routes
+
+// Nested parking sub-routes — these MUST be registered BEFORE the general
+// "/api/parking" mount below. Express matches mounted routers by path prefix
+// in registration order, so if the broader "/api/parking" router is mounted
+// first, it intercepts requests like "/api/parking/:id/floors" before they
+// ever reach floorVisualizationRoute or peakHoursRoute.
+app.use("/api/parking/:parkingId/floors", floorVisualizationRoute);
+app.use("/api/parking/:parkingId/peak-hours", peakHoursRoute);
+
+// get/Use Parking API routes (general — must come AFTER the nested routes above)
 app.use("/api/parking", parkingApi);
 
-app.use("/api/parking/:parkingId/floors", floorVisualizationRoute);
 // Use Booking Routes
 app.use("/api/bookings", bookingRouter);
 // Use slot management route.

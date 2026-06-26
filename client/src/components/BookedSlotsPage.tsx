@@ -4,6 +4,8 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import * as Icons from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
+import ExtendParkingModal from "./ExtendParkingModal";
+
 interface ParkingSlot {
   _id: string;
   name?: string;
@@ -24,6 +26,7 @@ interface Booking {
   duration?: number;
   totalPrice?: number;
   bookingStatus?: "active" | "cancelled" | "completed";
+  extensions?: any[]; // Added to track extensions used
 }
 
 const THEME_CLASSES = {
@@ -57,6 +60,12 @@ const THEME_CLASSES = {
   },
 } as const;
 
+const isBookingExpired = (dateString?: string, duration?: number): boolean => {
+  if (!dateString || !duration) return false;
+  const expiryTime = new Date(dateString).getTime() + duration * 60 * 60 * 1000;
+  return Date.now() > expiryTime;
+};
+
 const BookedSlotsPage: React.FC = () => {
   const [bookedSlots, setBookedSlots] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,6 +76,9 @@ const BookedSlotsPage: React.FC = () => {
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // State for Extend Parking Modal
+  const [extendBooking, setExtendBooking] = useState<Booking | null>(null);
 
   // Detect system theme
   const { theme } = useTheme();
@@ -1130,6 +1142,24 @@ const BookedSlotsPage: React.FC = () => {
                                 Exit Vehicle
                               </button>
                             )}
+                            
+                            {/* Extend Parking Button */}
+                            {booking.bookingStatus === "active" && (
+                              <button
+                                disabled={isBookingExpired(booking.bookingDate, booking.duration)}
+                                className={`w-full px-4 py-2 ${themeClasses.cardBg} border ${themeClasses.border} rounded-lg transition-colors text-sm flex items-center justify-center gap-2 ${
+                                  isBookingExpired(booking.bookingDate, booking.duration)
+                                    ? "opacity-50 cursor-not-allowed text-gray-500" // Disabled styling
+                                    : `${themeClasses.text} hover:bg-[#1B42CB]/10` // Active styling
+                                }`}
+                                onClick={() => setExtendBooking(booking)}
+                              >
+                                <Icons.TimerReset className="w-4 h-4" />
+                                {isBookingExpired(booking.bookingDate, booking.duration) 
+                                  ? "Cannot Extend (Expired)" 
+                                  : "Extend Parking"}
+                              </button>
+                            )}
 
                             {/* Download Receipt button */}
                             <button
@@ -1246,6 +1276,23 @@ const BookedSlotsPage: React.FC = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Extend Parking Modal */}
+        {extendBooking && (
+          <ExtendParkingModal
+            bookingId={extendBooking._id}
+            parkingName={extendBooking.parkingId?.name || "Unknown Parking"}
+            currentDuration={extendBooking.duration || 1}
+            bookingDate={extendBooking.bookingDate || new Date().toISOString()}
+            pricePerHour={extendBooking.parkingId?.pricePerHour || 0}
+            extensionsUsed={extendBooking.extensions?.length || 0}
+            onClose={() => setExtendBooking(null)}
+            onSuccess={() => {
+              setExtendBooking(null);
+              fetchBookedSlots();
+            }}
+          />
         )}
       </div>
     </div>
