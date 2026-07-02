@@ -21,6 +21,7 @@ import { connectRedis } from "./utils/cache.js";
 import "./jobs/bookingExpiry.js";
 import { setupLogger } from "./utils/logger.js";
 import { requestIdMiddleware } from "./middleware/requestId.js";
+import corsMiddleware from "./middleware/corsMiddleware.js";
 
 // Initialize global logger override
 setupLogger();
@@ -48,15 +49,7 @@ const app = express();
 app.set('trust proxy', 1); // Trust first proxy for express-rate-limit to work correctly behind reverse proxies
 
 const PORT = process.env.PORT || 5000;
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    exposedHeaders: ["Authorization"],
-  }),
-);
+app.use(corsMiddleware);
 // Middleware to parse JSON body (if needed later)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
